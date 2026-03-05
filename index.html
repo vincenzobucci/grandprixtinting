@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grand Prix Tinting | Miami Window Tint & Security Film</title>
+  <meta name="description" content="Grand Prix Tinting – premium window tint, ceramic tint, and security film services in Miami." />
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#12131a;
+      --muted:#a7abb8;
+      --text:#f5f7ff;
+      --line:rgba(255,255,255,.10);
+      --accent:#39ff14;
+      --accent2:#00c2ff;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(0,194,255,.22), transparent 60%),
+                  radial-gradient(900px 500px at 80% 0%, rgba(57,255,20,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.4;
+    }
+    a{color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 60px}
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 16px;border:1px solid var(--line);border-radius:999px;
+      background:rgba(18,19,26,.55);backdrop-filter: blur(10px);
+      position:sticky;top:14px;z-index:5;
+    }
+    .brand{display:flex;gap:10px;align-items:center;font-weight:800;letter-spacing:.3px}
+    .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .navlinks{display:flex;gap:14px;flex-wrap:wrap}
+    .navlinks a{font-size:14px;text-decoration:none;color:var(--muted)}
+    .navlinks a:hover{color:var(--text)}
+    .hero{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), transparent 40%),
+        radial-gradient(900px 350px at 30% 15%, rgba(0,194,255,.22), transparent 60%),
+        radial-gradient(800px 350px at 70% 10%, rgba(57,255,20,.14), transparent 60%),
+        rgba(18,19,26,.45);
+      backdrop-filter: blur(10px);
+    }
+    .heroInner{padding:34px 22px 22px;display:grid;gap:18px}
+    h1{margin:0;font-size:34px;letter-spacing:-.6px}
+    .sub{margin:0;color:var(--muted);max-width:62ch}
+    .ctaRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(11,12,16,.45);
+      padding:10px 14px;border-radius:12px;
+      text-decoration:none;font-weight:700;font-size:14px;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.22)}
+    .btnPrimary{
+      border-color:rgba(57,255,20,.55);
+      box-shadow:0 0 0 3px rgba(57,255,20,.10);
+    }
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:14px;
+    }
+    .card{
+      grid-column:span 12;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(18,19,26,.50);
+      backdrop-filter: blur(10px);
+      padding:18px;
+    }
+    .card h2{margin:0 0 10px;font-size:18px}
+    .muted{color:var(--muted)}
+    .services{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-top:10px}
+    .pill{
+      grid-column:span 12;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 12px;
+      background:rgba(11,12,16,.35);
+      display:flex;justify-content:space-between;gap:10px;align-items:center;
+    }
+    .pill strong{font-size:14px}
+    .pill span{font-size:13px;color:var(--muted)}
+    @media(min-width:760px){
+      h1{font-size:42px}
+      .pill{grid-column:span 6}
+      .card.col6{grid-column:span 6}
+      .card.col7{grid-column:span 7}
+      .card.col5{grid-column:span 5}
+    }
+    label{display:block;margin:10px 0 6px;font-size:13px;color:var(--muted)}
+    input,textarea{
+      width:100%;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(11,12,16,.35);
+      color:var(--text);
+      padding:10px 12px;border-radius:12px;
+      outline:none;
+    }
+    input:focus,textarea:focus{border-color:rgba(0,194,255,.5)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .small{font-size:12px;color:var(--muted)}
+    .result{
+      margin-top:12px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(11,12,16,.25);
+    }
+    .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:13px}
+    .kv div:nth-child(odd){color:var(--muted)}
+    .status{font-size:13px;color:var(--muted);margin-top:8px}
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    .socialLinks{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+    .socialLinks a{font-size:14px}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand"><span class="dot"></span> Grand Prix Tinting</div>
+      <div class="navlinks">
+        <a href="#services">Services</a>
+        <a href="#vin">VIN Tool</a>
+        <a href="#social">Social</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+
+    <section class="hero" id="top">
+      <div class="heroInner">
+        <div>
+          <h1>Premium Window Tint & Security Film in Miami</h1>
+          <p class="sub">Fast, clean installs. Ceramic tint, privacy options, and security film. Use our VIN decoder tool to pull vehicle details in seconds.</p>
+          <div class="ctaRow">
+            <a class="btn btnPrimary" href="tel:+1XXXXXXXXXX">📞 Call Now</a>
+            <a class="btn" href="#contact">📅 Request Appointment</a>
+            <a class="btn" href="#vin">🔎 VIN Decoder</a>
+          </div>
+          <p class="small">Tip: replace the phone number in the code (search for <b>+1XXXXXXXXXX</b>).</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card col7" id="services">
+        <h2>Services</h2>
+        <div class="services">
+          <div class="pill"><strong>Ceramic Window Tint</strong><span>heat rejection + clarity</span></div>
+          <div class="pill"><strong>Carbon / Dyed Tint</strong><span>privacy + style</span></div>
+          <div class="pill"><strong>Security Film</strong><span>impact & smash resistance</span></div>
+          <div class="pill"><strong>Dealership / Fleet</strong><span>fast turnaround</span></div>
+        </div>
+        <p class="status">Serving Hialeah, Miami, Doral, Kendall, and nearby areas.</p>
+      </section>
+
+      <section class="card col5" id="vin">
+        <h2>VIN Decoder Tool</h2>
+        <p class="muted">For installers: paste a 17-character VIN and decode. Data source: NHTSA (public VIN decode).</p>
+
+        <label for="vinInput">VIN</label>
+        <input id="vinInput" maxlength="17" placeholder="Enter 17-digit VIN" autocomplete="off" />
+
+        <div class="row">
+          <button class="btn btnPrimary" id="decodeBtn" type="button">Decode VIN</button>
+          <button class="btn" id="clearBtn" type="button">Clear</button>
+        </div>
+
+        <div class="status" id="vinStatus">Ready.</div>
+
+        <div class="result" id="vinResult" style="display:none;">
+          <div class="kv" id="vinKV"></div>
+        </div>
+
+        <p class="small">If a VIN returns limited info, it’s normal. Some trims/body styles aren’t fully populated for every manufacturer.</p>
+      </section>
+
+      <section class="card col6" id="social">
+        <h2>Social Media</h2>
+        <p class="muted">Drop your links here. Later we can embed Instagram/TikTok previews if you want.</p>
+        <div class="socialLinks">
+          <a class="btn" href="https://instagram.com/" target="_blank" rel="noreferrer">📷 Instagram</a>
+          <a class="btn" href="https://tiktok.com/" target="_blank" rel="noreferrer">🎵 TikTok</a>
+          <a class="btn" href="https://facebook.com/" target="_blank" rel="noreferrer">📘 Facebook</a>
+        </div>
+        <p class="small">Replace these URLs with your real profiles.</p>
+      </section>
+
+      <section class="card col6" id="contact">
+        <h2>Contact</h2>
+        <p class="muted">Tell us what car it is and what you want to do.</p>
+        <form onsubmit="event.preventDefault(); alert('This form is static for now. We can connect it to email later.');">
+          <label for="name">Name</label>
+          <input id="name" placeholder="Your name" />
+          <label for="phone">Phone</label>
+          <input id="phone" placeholder="(305) 555-1234" />
+          <label for="msg">Message</label>
+          <textarea id="msg" rows="4" placeholder="Car year/make/model + what you want (tint %, security film, etc.)"></textarea>
+          <div class="row">
+            <button class="btn btnPrimary" type="submit">Send</button>
+            <a class="btn" href="mailto:youremail@example.com">Email</a>
+          </div>
+          <p class="small">We’ll connect this form to your email next (super easy).</p>
+        </form>
+      </section>
+    </div>
+
+    <footer>© <span id="year"></span> Grand Prix Tinting. Built on GitHub Pages.</footer>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const vinInput = document.getElementById("vinInput");
+    const statusEl = document.getElementById("vinStatus");
+    const resultBox = document.getElementById("vinResult");
+    const kvEl = document.getElementById("vinKV");
+
+    const prettyPick = (arr, key) => {
+      const item = arr.find(x => x.Variable === key && x.Value && x.Value !== "Not Applicable");
+      return item ? item.Value : "";
+    };
+
+    const setStatus = (t) => statusEl.textContent = t;
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      vinInput.value = "";
+      kvEl.innerHTML = "";
+      resultBox.style.display = "none";
+      setStatus("Ready.");
+      vinInput.focus();
+    });
+
+    document.getElementById("decodeBtn").addEventListener("click", async () => {
+      const vin = (vinInput.value || "").trim().toUpperCase();
+      if (vin.length !== 17) {
+        setStatus("VIN must be 17 characters.");
+        resultBox.style.display = "none";
+        return;
+      }
+
+      setStatus("Decoding…");
+      resultBox.style.display = "none";
+      kvEl.innerHTML = "";
+
+      try {
+        const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${vin}?format=json`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const r = (data && data.Results && data.Results[0]) ? data.Results[0] : null;
+
+        if (!r) {
+          setStatus("No results returned.");
+          return;
+        }
+
+        // Key fields
+        const fields = [
+          ["Year", r.ModelYear],
+          ["Make", r.Make],
+          ["Model", r.Model],
+          ["Trim", r.Trim],
+          ["Body Class", r.BodyClass],
+          ["Doors", r.Doors],
+          ["Drive Type", r.DriveType],
+          ["Engine", [r.EngineCylinders, r.DisplacementL, r.FuelTypePrimary].filter(Boolean).join(" | ")],
+          ["Vehicle Type", r.VehicleType],
+          ["Plant", [r.PlantCity, r.PlantState, r.PlantCountry].filter(Boolean).join(", ")],
+        ];
+
+        // Build UI
+        kvEl.innerHTML = fields
+          .filter(([k,v]) => v && String(v).trim() && v !== "Not Applicable")
+          .map(([k,v]) => `<div>${k}</div><div><b>${String(v)}</b></div>`)
+          .join("");
+
+        if (!kvEl.innerHTML) {
+          kvEl.innerHTML = `<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, but limited data returned.</b></div>`;
+        }
+
+        resultBox.style.display = "block";
+        setStatus("Done.");
+      } catch (e) {
+        setStatus("Error decoding VIN. Try again.");
+      }
+    });
+
+    vinInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") document.getElementById("decodeBtn").click();
+    });
+  </script>
+</body>
+</html>
