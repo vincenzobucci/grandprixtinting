@@ -199,8 +199,15 @@ Grand Prix Accessories
         <input id="vinInput" maxlength="17" placeholder="Enter 17-digit VIN" autocomplete="off" />
 
         <div class="row">
-         <button class="btn btnPrimary" id="decodeBtn" type="button" style="color:white;">Decode VIN</button>
-          <button class="btn" id="clearBtn" type="button">Clear</button>
+         <button id="decodeBtn" type="button"
+style="background:#22c55e;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-right:8px;">
+Decode VIN
+</button>
+
+<button id="clearBtn" type="button"
+style="background:#374151;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;">
+Clear
+</button>
         </div>
 
         <div class="status" id="vinStatus">Ready.</div>
@@ -234,8 +241,15 @@ Grand Prix Accessories
           <label for="msg">Message</label>
           <textarea id="msg" rows="4" placeholder="Car year/make/model + what you want (tint %,type of film, etc.)"></textarea>
           <div class="row">
-            <button class="btn btnPrimary" type="submit">Send</button>
-            <a class="btn" href="mailto:youremail@example.com">Email</a>
+           <button type="submit"
+style="background:#22c55e;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-right:8px;">
+Send
+</button>
+
+<a href="mailto:youremail@example.com"
+style="background:#374151;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
+Email
+</a>
           </div>
           <p class="small">We’ll connect this form to your email next (super easy).</p>
         </form>
