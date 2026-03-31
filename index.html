@@ -1,346 +1,686 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Grand Prix Accessories | Miami Window Tint </title>
-  <meta name="description" content="Grand Prix Accessories – premium window tint, ceramic tint services in Miami." />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Grand Prix Accessories | Miami Window Tint</title>
+  <meta name="description" content="Grand Prix Accessories – premium mobile window tint, ceramic tint services in Miami Dade & Broward. We come to you."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     :root{
-      --bg:#0b0c10;
-      --card:#12131a;
-      --muted:#a7abb8;
-      --text:#f5f7ff;
-      --line:rgba(255,255,255,.10);
-      --accent:#39ff14;
-      --accent2:#00c2ff;
-      --radius:18px;
+      --bg:#080a0f;
+      --card:rgba(255,255,255,0.04);
+      --card-border:rgba(255,255,255,0.08);
+      --muted:#7a8299;
+      --text:#eef0f8;
+      --accent:#c8ff00;
+      --accent2:#00d4ff;
+      --accent-rgb:200,255,0;
+      --radius:16px;
     }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
     body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(0,194,255,.22), transparent 60%),
-                  radial-gradient(900px 500px at 80% 0%, rgba(57,255,20,.18), transparent 55%),
-                  var(--bg);
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg);
       color:var(--text);
-      line-height:1.4;
+      line-height:1.55;
+      overflow-x:hidden;
     }
-    a{color:inherit}
-    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 60px}
-    .nav{
+
+    /* NOISE TEXTURE */
+    body::before{
+      content:'';
+      position:fixed;inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none;z-index:0;opacity:0.5;
+    }
+
+    /* GLOW BLOBS */
+    .blob1,.blob2{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:0.18}
+    .blob1{width:700px;height:500px;background:var(--accent2);top:-200px;left:-200px}
+    .blob2{width:600px;height:400px;background:var(--accent);bottom:-150px;right:-150px}
+
+    a{color:inherit;text-decoration:none}
+
+    /* NAV */
+    nav{
+      position:sticky;top:0;z-index:100;
       display:flex;align-items:center;justify-content:space-between;
-      padding:14px 16px;border:1px solid var(--line);border-radius:999px;
-      background:rgba(18,19,26,.55);backdrop-filter: blur(10px);
-      position:sticky;top:14px;z-index:5;
+      padding:14px 24px;
+      background:rgba(8,10,15,0.8);
+      backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--card-border);
     }
-    .brand{display:flex;gap:10px;align-items:center;font-weight:800;letter-spacing:.3px}
-    .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2))}
-    .navlinks{display:flex;gap:14px;flex-wrap:wrap}
-    .navlinks a{font-size:14px;text-decoration:none;color:var(--muted)}
-    .navlinks a:hover{color:var(--text)}
+    .nav-brand{display:flex;align-items:center;gap:10px}
+    .nav-brand img{height:38px;border-radius:6px}
+    .nav-brand span{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--text)}
+    .nav-links{display:flex;gap:6px;flex-wrap:wrap}
+    .nav-links a{
+      font-size:13px;font-weight:500;color:var(--muted);
+      padding:6px 14px;border-radius:999px;
+      transition:all 0.2s;
+    }
+    .nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.06)}
+    .nav-cta{
+      background:var(--accent);color:#080a0f;
+      padding:8px 18px;border-radius:999px;
+      font-weight:700;font-size:13px;
+      transition:opacity 0.2s;
+    }
+    .nav-cta:hover{opacity:0.85}
+
+    /* HERO */
     .hero{
-      margin-top:18px;
-      border:1px solid var(--line);
-      border-radius:var(--radius);
+      position:relative;z-index:1;
+      min-height:92vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      text-align:center;
+      padding:80px 24px 60px;
       overflow:hidden;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), transparent 40%),
-        radial-gradient(900px 350px at 30% 15%, rgba(0,194,255,.22), transparent 60%),
-        radial-gradient(800px 350px at 70% 10%, rgba(57,255,20,.14), transparent 60%),
-        rgba(18,19,26,.45);
-      backdrop-filter: blur(10px);
     }
-    .heroInner{padding:34px 22px 22px;display:grid;gap:18px}
-    h1{margin:0;font-size:34px;letter-spacing:-.6px}
-    .sub{margin:0;color:var(--muted);max-width:62ch}
-    .ctaRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
-    .btn{
-      border:1px solid var(--line);
-      background:rgba(11,12,16,.45);
-      padding:10px 14px;border-radius:12px;
-      text-decoration:none;font-weight:700;font-size:14px;
+    .hero-eyebrow{
       display:inline-flex;align-items:center;gap:8px;
+      background:rgba(200,255,0,0.1);
+      border:1px solid rgba(200,255,0,0.25);
+      color:var(--accent);
+      font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+      padding:6px 16px;border-radius:999px;
+      margin-bottom:28px;
+      animation:fadeUp 0.6s ease both;
     }
-    .btn:hover{border-color:rgba(255,255,255,.22)}
-    .btnPrimary{
-      border-color:rgba(57,255,20,.55);
-      box-shadow:0 0 0 3px rgba(57,255,20,.10);
+    .hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .hero h1{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(56px,12vw,130px);
+      line-height:0.92;
+      letter-spacing:2px;
+      margin-bottom:24px;
+      animation:fadeUp 0.7s 0.1s ease both;
     }
-    .grid{
-      margin-top:18px;
+    .hero h1 .accent{color:var(--accent)}
+    .hero-sub{
+      font-size:clamp(16px,2vw,20px);
+      color:var(--muted);
+      max-width:52ch;
+      margin:0 auto 36px;
+      font-weight:300;
+      animation:fadeUp 0.7s 0.2s ease both;
+    }
+    .hero-ctas{
+      display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+      animation:fadeUp 0.7s 0.3s ease both;
+    }
+    .btn-primary{
+      background:var(--accent);color:#080a0f;
+      padding:14px 28px;border-radius:999px;
+      font-weight:700;font-size:15px;
+      display:inline-flex;align-items:center;gap:8px;
+      transition:transform 0.2s,opacity 0.2s;
+    }
+    .btn-primary:hover{transform:translateY(-2px);opacity:0.9}
+    .btn-ghost{
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);
+      padding:14px 28px;border-radius:999px;
+      font-weight:500;font-size:15px;
+      display:inline-flex;align-items:center;gap:8px;
+      transition:all 0.2s;
+    }
+    .btn-ghost:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px)}
+    .hero-tip{
+      margin-top:20px;font-size:12px;color:var(--muted);
+      animation:fadeUp 0.7s 0.4s ease both;
+    }
+    .hero-stats{
+      display:flex;gap:40px;flex-wrap:wrap;justify-content:center;
+      margin-top:60px;padding-top:40px;
+      border-top:1px solid var(--card-border);
+      width:100%;max-width:600px;
+      animation:fadeUp 0.7s 0.5s ease both;
+    }
+    .stat-item{text-align:center}
+    .stat-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--accent);letter-spacing:1px}
+    .stat-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+    /* SECTIONS */
+    .section{
+      position:relative;z-index:1;
+      max-width:1100px;margin:0 auto;
+      padding:80px 24px;
+    }
+    .section-label{
+      font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+      color:var(--accent);margin-bottom:12px;
+    }
+    .section-title{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(36px,5vw,56px);
+      letter-spacing:1px;
+      margin-bottom:40px;
+    }
+    .divider{border:none;border-top:1px solid var(--card-border);margin:0}
+
+    /* SERVICES */
+    .services-grid{
       display:grid;
-      grid-template-columns:repeat(12,1fr);
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:16px;
+    }
+    .service-card{
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      padding:28px 24px;
+      transition:border-color 0.2s,transform 0.2s;
+    }
+    .service-card:hover{border-color:rgba(200,255,0,0.3);transform:translateY(-3px)}
+    .service-icon{
+      width:44px;height:44px;border-radius:10px;
+      background:rgba(200,255,0,0.1);
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;margin-bottom:16px;
+    }
+    .service-card h3{font-size:17px;font-weight:600;margin-bottom:6px}
+    .service-card p{font-size:14px;color:var(--muted)}
+
+    /* REVIEWS */
+    .reviews-header{
+      display:flex;align-items:flex-end;justify-content:space-between;
+      flex-wrap:wrap;gap:16px;margin-bottom:32px;
+    }
+    .rating-badge{
+      display:flex;align-items:center;gap:12px;
+      background:rgba(200,255,0,0.08);
+      border:1px solid rgba(200,255,0,0.2);
+      border-radius:var(--radius);
+      padding:16px 20px;
+    }
+    .rating-num{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--accent);line-height:1}
+    .rating-right{}
+    .stars{color:#fbbf24;font-size:18px;letter-spacing:2px}
+    .rating-count{font-size:13px;color:var(--muted);margin-top:2px}
+    .reviews-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
       gap:14px;
     }
-    .card{
-      grid-column:span 12;
-      border:1px solid var(--line);
+    .review-card{
+      background:var(--card);
+      border:1px solid var(--card-border);
       border-radius:var(--radius);
-      background:rgba(18,19,26,.50);
-      backdrop-filter: blur(10px);
-      padding:18px;
+      padding:20px;
+      transition:border-color 0.2s;
     }
-    .card h2{margin:0 0 10px;font-size:18px}
-    .muted{color:var(--muted)}
-    .services{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-top:10px}
-    .pill{
-      grid-column:span 12;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px 12px;
-      background:rgba(11,12,16,.35);
-      display:flex;justify-content:space-between;gap:10px;align-items:center;
+    .review-card:hover{border-color:rgba(255,255,255,0.15)}
+    .review-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .review-avatar{
+      width:40px;height:40px;border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:15px;color:#080a0f;
+      flex-shrink:0;
     }
-    .pill strong{font-size:14px}
-    .pill span{font-size:13px;color:var(--muted)}
-    @media(min-width:760px){
-      h1{font-size:42px}
-      .pill{grid-column:span 6}
-      .card.col6{grid-column:span 6}
-      .card.col7{grid-column:span 7}
-      .card.col5{grid-column:span 5}
+    .review-name{font-weight:600;font-size:14px}
+    .review-date{font-size:12px;color:var(--muted);margin-top:1px}
+    .review-stars{color:#fbbf24;font-size:13px;margin-bottom:8px;letter-spacing:1px}
+    .review-text{font-size:13px;color:#c0c5d8;line-height:1.6}
+    .review-cta{
+      display:inline-flex;align-items:center;gap:6px;
+      margin-top:28px;font-size:13px;color:var(--muted);
+      border:1px solid var(--card-border);border-radius:999px;
+      padding:8px 18px;transition:all 0.2s;
     }
-    label{display:block;margin:10px 0 6px;font-size:13px;color:var(--muted)}
-    input,textarea{
-      width:100%;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(11,12,16,.35);
-      color:var(--text);
-      padding:10px 12px;border-radius:12px;
-      outline:none;
+    .review-cta:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+
+    /* SOCIAL */
+    .social-grid{display:flex;gap:12px;flex-wrap:wrap}
+    .social-btn{
+      display:inline-flex;align-items:center;gap:10px;
+      background:var(--card);border:1px solid var(--card-border);
+      border-radius:var(--radius);padding:14px 20px;
+      font-weight:500;font-size:14px;
+      transition:all 0.2s;
     }
-    input:focus,textarea:focus{border-color:rgba(0,194,255,.5)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
-    .small{font-size:12px;color:var(--muted)}
-    .result{
-      margin-top:12px;
-      border:1px dashed rgba(255,255,255,.18);
-      border-radius:14px;
-      padding:12px;
-      background:rgba(11,12,16,.25);
+    .social-btn:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-2px)}
+    .social-btn svg{width:20px;height:20px;flex-shrink:0}
+
+    /* VIN */
+    .vin-wrap{
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      padding:28px;
+      max-width:600px;
+    }
+    .vin-wrap label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:500}
+    .vin-input{
+      width:100%;background:rgba(0,0,0,0.3);
+      border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);padding:12px 16px;
+      border-radius:10px;font-size:15px;font-family:'DM Sans',sans-serif;
+      outline:none;transition:border-color 0.2s;letter-spacing:1px;
+    }
+    .vin-input:focus{border-color:rgba(0,212,255,0.5)}
+    .vin-btns{display:flex;gap:10px;margin-top:12px}
+    .vin-decode{
+      background:var(--accent);color:#080a0f;
+      border:none;padding:11px 22px;border-radius:10px;
+      font-weight:700;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;
+    }
+    .vin-clear{
+      background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+      color:var(--text);padding:11px 18px;border-radius:10px;
+      font-weight:500;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;
+    }
+    .vin-status{font-size:13px;color:var(--muted);margin-top:10px}
+    .vin-result{
+      margin-top:14px;border:1px dashed rgba(255,255,255,0.12);
+      border-radius:12px;padding:14px;
+      background:rgba(0,0,0,0.2);display:none;
     }
     .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:13px}
     .kv div:nth-child(odd){color:var(--muted)}
-    .status{font-size:13px;color:var(--muted);margin-top:8px}
-    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
-    .socialLinks{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-    .socialLinks a{font-size:14px}
+
+    /* CONTACT */
+    .contact-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+    }
+    @media(max-width:640px){.contact-grid{grid-template-columns:1fr}}
+    .contact-form{
+      background:var(--card);border:1px solid var(--card-border);
+      border-radius:var(--radius);padding:28px;
+    }
+    .contact-form label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;margin-top:14px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+    .contact-form label:first-child{margin-top:0}
+    .contact-form input,.contact-form textarea{
+      width:100%;background:rgba(0,0,0,0.3);
+      border:1px solid rgba(255,255,255,0.10);
+      color:var(--text);padding:11px 14px;
+      border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;
+      outline:none;transition:border-color 0.2s;resize:none;
+    }
+    .contact-form input:focus,.contact-form textarea:focus{border-color:rgba(0,212,255,0.45)}
+    .contact-form .send-btn{
+      width:100%;margin-top:16px;
+      background:var(--accent);color:#080a0f;
+      border:none;padding:13px;border-radius:10px;
+      font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif;
+      transition:opacity 0.2s;
+    }
+    .contact-form .send-btn:hover{opacity:0.85}
+    .contact-info{display:flex;flex-direction:column;gap:14px}
+    .info-card{
+      background:var(--card);border:1px solid var(--card-border);
+      border-radius:var(--radius);padding:20px;
+    }
+    .info-card-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+    .info-card-val{font-size:16px;font-weight:600}
+    .info-card-val a{color:var(--accent)}
+    .info-card-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+    /* FOOTER */
+    footer{
+      position:relative;z-index:1;
+      text-align:center;padding:32px 24px;
+      border-top:1px solid var(--card-border);
+      font-size:13px;color:var(--muted);
+    }
+    footer strong{color:var(--text)}
+
+    /* MOBILE NAV */
+    @media(max-width:600px){
+      .nav-links{display:none}
+      .hero h1{font-size:64px}
+    }
   </style>
 </head>
-
 <body>
- <header style="background:black; text-align:center; padding:60px;">
-<img src="LOGOBIEN.JPEG" alt="Grand Prix Accessories"
-style="width:100%; max-width:420px; height:auto;">
 
-<h1 style="
-color:white;
-font-size:48px;
-margin-top:10px;
-font-weight:800;
-letter-spacing:2px;
-">
-MOBILE WINDOW TINTING
-</h1>
+<div class="blob1"></div>
+<div class="blob2"></div>
 
-<p style="
-color:#9ca3af;
-font-size:18px;
-margin-top:10px;
-">
-Ceramic Tint • Professional Installation
-</p>
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <img src="LOGOBIEN.JPEG" alt="Grand Prix Accessories logo"/>
+    <span>Grand Prix Accessories</span>
+  </div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#vin">VIN Decoder</a>
+    <a href="#contact">Contact</a>
+    <a href="/schedule.html" target="_blank">Schedule</a>
+  </div>
+  <a class="nav-cta" href="tel:+17865238793">📞 Call Now</a>
+</nav>
 
-</header>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-<img src="LOGOBIEN.JPEG" style="height:42px;margin-right:10px;border-radius:6px">
-Grand Prix Accessories
-</div>
-      <div class="navlinks">
-  <a href="#services">Services</a>
-  <a href="#social">Social</a>
-  <a href="#contact">Contact</a>
-  <a href="/schedule.html" target="_blank">Schedule</a>
-</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span>Mobile Service · Miami Dade &amp; Broward</span>
+  </div>
+  <h1>WINDOW<br><span class="accent">TINTING</span><br>PRO</h1>
+  <p class="hero-sub">We come to you. Fast, clean ceramic tint installs at your home, office, or anywhere in Miami.</p>
+  <div class="hero-ctas">
+    <a class="btn-primary" href="tel:+17865238793">📞 Call or Text</a>
+    <a class="btn-ghost" href="#contact">📅 Request Appointment</a>
+    <a class="btn-ghost" href="/schedule.html" target="_blank">🗓 Book Online</a>
+  </div>
+  <p class="hero-tip">Mon – Sat · 9 AM to 5 PM</p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">4.8</div>
+      <div class="stat-lbl">Google Rating</div>
     </div>
+    <div class="stat-item">
+      <div class="stat-num">47+</div>
+      <div class="stat-lbl">Reviews</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">6+</div>
+      <div class="stat-lbl">Years in Miami</div>
+    </div>
+  </div>
+</section>
 
-    <section class="hero" id="top">
-      <div class="heroInner">
-        <div>
-          <h1>Premium Window Tint in Miami</h1>
-          <p class="sub">Fast, clean installs. Ceramic tint, privacy options. Use our VIN decoder tool to pull vehicle details in seconds.</p>
-          <div class="ctaRow">
-            <a class="btn btnPrimary" href="tel:+1(786)523-8793">📞 Call Now</a>
-            <a class="btn" href="#contact">📅 Request Appointment</a>
-            <a class="btn" href="#vin">🔎 VIN Decoder</a>
-          </div>
-          <p class="small"> (Tip: Call or Text monday trough saturday 9am to 5pm).</p>
-        </div>
+<hr class="divider"/>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-label">What we do</div>
+  <div class="section-title">Our Services</div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">🚗</div>
+      <h3>Ceramic Window Tint</h3>
+      <p>Premium ceramic film for superior heat rejection, UV protection, and crystal clarity. Your car stays cooler, your skin stays protected.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🏠</div>
+      <h3>Residential &amp; Commercial Tint</h3>
+      <p>Privacy and protection for your home or office windows. We handle everything from apartments to office buildings.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📍</div>
+      <h3>100% Mobile Service</h3>
+      <p>We come to you — your home, workplace, or any location. No need to drive anywhere or wait at a shop.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">⚡</div>
+      <h3>Fast Installs</h3>
+      <p>Most vehicles done in 30–60 minutes. Professional installation with clean, bubble-free results every time.</p>
+    </div>
+  </div>
+  <p style="margin-top:20px;font-size:14px;color:var(--muted)">Serving Miami Dade &amp; Broward County areas.</p>
+</section>
+
+<hr class="divider"/>
+
+<!-- REVIEWS -->
+<section class="section" id="reviews">
+  <div class="section-label">What clients say</div>
+  <div class="reviews-header">
+    <div class="section-title" style="margin-bottom:0">Google Reviews</div>
+    <div class="rating-badge">
+      <div class="rating-num">4.8</div>
+      <div class="rating-right">
+        <div class="stars">★★★★★</div>
+        <div class="rating-count">47 reviews on Google</div>
       </div>
-    </section>
-
-    <div class="grid">
-      <section class="card col7" id="services">
-        <h2>Services</h2>
-        <div class="services">
-          <div class="pill"><strong>Ceramic Window Tint</strong><span>heat rejection + clarity</span></div>
-          <div class="pill"><strong>Residential / Commercial Window Tint</strong><span>privacy + protection</span></div>
-          
-        </div>
-        <p class="status">Serving Miami Dade & Broward County areas.</p>
-      </section>
-
-      <section class="card col5" id="vin">
-        <h2>VIN Decoder Tool</h2>
-        <p class="muted">For installers: paste a 17-character VIN and decode. Data source: NHTSA (public VIN decode).</p>
-
-        <label for="vinInput">VIN</label>
-        <input id="vinInput" maxlength="17" placeholder="Enter 17-digit VIN" autocomplete="off" />
-
-        <div class="row">
-         <button id="decodeBtn" type="button"
-style="background:#22c55e;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-right:8px;">
-Decode VIN
-</button>
-
-<button id="clearBtn" type="button"
-style="background:#374151;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;">
-Clear
-</button>
-        </div>
-
-        <div class="status" id="vinStatus">Ready.</div>
-
-        <div class="result" id="vinResult" style="display:none;">
-          <div class="kv" id="vinKV"></div>
-        </div>
-
-        <p class="small">If a VIN returns limited info, it’s normal. Some trims/body styles aren’t fully populated for every manufacturer.</p>
-      </section>
-
-      <section class="card col6" id="social">
-        <h2>Social Media</h2>
-        <p class="muted">Drop your links here. Later we can embed Instagram/TikTok previews if you want.</p>
-        <div class="socialLinks">
-          <a class="btn" href="https://instagram.com/grandprix.miami" target="_blank" rel="noreferrer">📷 Instagram</a>
-          <a class="btn" href="https://tiktok.com/" target="_blank" rel="noreferrer">🎵 TikTok</a>
-          <a class="btn" href="https://facebook.com/" target="_blank" rel="noreferrer">📘 Facebook</a>
-        </div>
-        <p class="small">Replace these URLs with your real profiles.</p>
-      </section>
-
-      <section class="card col6" id="contact">
-        <h2>Contact</h2>
-        <p class="muted">Tell us what car it is and what you want to do.</p>
-        <form onsubmit="event.preventDefault(); alert('This form is static for now. We can connect it to email later.');">
-          <label for="name">Name</label>
-          <input id="name" placeholder="Your name" />
-          <label for="phone">Phone</label>
-          <input id="phone" placeholder="(305) 555-1234" />
-          <label for="msg">Message</label>
-          <textarea id="msg" rows="4" placeholder="Car year/make/model + what you want (tint %,type of film, etc.)"></textarea>
-          <div class="row">
-           <button type="submit"
-style="background:#22c55e;color:white;border:none;padding:10px 18px;border-radius:8px;font-weight:600;cursor:pointer;margin-right:8px;">
-Send
-</button>
-
-<a href="mailto:grandprixaccesoriesllc@gmail.com"
-style="background:#374151;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
-Email
-</a>
-          </div>
-          <p class="small">We’ll connect this form to your email next (super easy).</p>
-        </form>
-      </section>
     </div>
-
-    <footer>© <span id="year"></span> Grand Prix Accessories.</footer>
   </div>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+  <div class="reviews-grid">
 
-    const vinInput = document.getElementById("vinInput");
-    const statusEl = document.getElementById("vinStatus");
-    const resultBox = document.getElementById("vinResult");
-    const kvEl = document.getElementById("vinKV");
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">JJ</div>
+        <div>
+          <div class="review-name">Jaeden J</div>
+          <div class="review-date">4 months ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Vincenzo was incredibly friendly, professional and efficient. He and his assistant tinted all my windows in just 30 minutes while I worked from home. The experience was flawless and I'm so grateful for the excellent service!"</p>
+    </div>
 
-    const prettyPick = (arr, key) => {
-      const item = arr.find(x => x.Variable === key && x.Value && x.Value !== "Not Applicable");
-      return item ? item.Value : "";
-    };
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">MC</div>
+        <div>
+          <div class="review-name">Macy CK (Sam)</div>
+          <div class="review-date">8 months ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Excellent work! Very professional and punctual. Very convenient since they simply come to your home. Communication is efficient. Everything came out perfect. Highly recommend!"</p>
+    </div>
 
-    const setStatus = (t) => statusEl.textContent = t;
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">RS</div>
+        <div>
+          <div class="review-name">Ray Santiago</div>
+          <div class="review-date">1 year ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"These gentlemen are nothing short of amazing! There is absolutely no one else I would trust with my vehicle and home/office tinting. Super nice and very clean and organized. Reasonable pricing and they stand behind their work!"</p>
+    </div>
 
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      vinInput.value = "";
-      kvEl.innerHTML = "";
-      resultBox.style.display = "none";
-      setStatus("Ready.");
-      vinInput.focus();
-    });
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">KP</div>
+        <div>
+          <div class="review-name">Kristian Perez</div>
+          <div class="review-date">1 year ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Excellent price, especially given service is done at home. They are efficient, punctual and did an outstanding job."</p>
+    </div>
 
-    document.getElementById("decodeBtn").addEventListener("click", async () => {
-      const vin = (vinInput.value || "").trim().toUpperCase();
-      if (vin.length !== 17) {
-        setStatus("VIN must be 17 characters.");
-        resultBox.style.display = "none";
-        return;
-      }
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">FA</div>
+        <div>
+          <div class="review-name">Fayez Abboud</div>
+          <div class="review-date">2 years ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Great experience! Vincenzo and his team did my car and office. Came in and out with no issue and the job came out great!"</p>
+    </div>
 
-      setStatus("Decoding…");
-      resultBox.style.display = "none";
-      kvEl.innerHTML = "";
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">AP</div>
+        <div>
+          <div class="review-name">Ashley Pasos</div>
+          <div class="review-date">3 years ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Highly recommend! Their professionalism, customer service, and work is outstanding. Very pleased with my experience overall. Very convenient to have them tint my vehicle while I was at work!"</p>
+    </div>
 
-      try {
-        const url = `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${vin}?format=json`;
-        const res = await fetch(url);
-        const data = await res.json();
-        const r = (data && data.Results && data.Results[0]) ? data.Results[0] : null;
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">WB</div>
+        <div>
+          <div class="review-name">Waleska Báez</div>
+          <div class="review-date">3 years ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"A professional in his work. Very respectful and friendly treatment. On time as agreed. And the best part is they come to where you are. Everything came out excellent."</p>
+    </div>
 
-        if (!r) {
-          setStatus("No results returned.");
-          return;
-        }
+    <div class="review-card">
+      <div class="review-top">
+        <div class="review-avatar">KB</div>
+        <div>
+          <div class="review-name">Kraft Built</div>
+          <div class="review-date">6 years ago</div>
+        </div>
+      </div>
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Where is ten stars?!? So glad I found these guys. Just did tint and lights on my Mercedes C 300. Lots more audio/visual work to come on my truck. Thanks!!!"</p>
+    </div>
 
-        // Key fields
-        const fields = [
-          ["Year", r.ModelYear],
-          ["Make", r.Make],
-          ["Model", r.Model],
-          ["Trim", r.Trim],
-          ["Body Class", r.BodyClass],
-          ["Doors", r.Doors],
-          ["Drive Type", r.DriveType],
-          ["Engine", [r.EngineCylinders, r.DisplacementL, r.FuelTypePrimary].filter(Boolean).join(" | ")],
-          ["Vehicle Type", r.VehicleType],
-          ["Plant", [r.PlantCity, r.PlantState, r.PlantCountry].filter(Boolean).join(", ")],
-        ];
+  </div>
 
-        // Build UI
-        kvEl.innerHTML = fields
-          .filter(([k,v]) => v && String(v).trim() && v !== "Not Applicable")
-          .map(([k,v]) => `<div>${k}</div><div><b>${String(v)}</b></div>`)
-          .join("");
+  <a class="review-cta" href="https://www.google.com/maps/place/Grand+Prix+Accesories+LLC" target="_blank" rel="noreferrer">
+    View all 47 reviews on Google →
+  </a>
+</section>
 
-        if (!kvEl.innerHTML) {
-          kvEl.innerHTML = `<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, but limited data returned.</b></div>`;
-        }
+<hr class="divider"/>
 
-        resultBox.style.display = "block";
-        setStatus("Done.");
-      } catch (e) {
-        setStatus("Error decoding VIN. Try again.");
-      }
-    });
+<!-- SOCIAL -->
+<section class="section" id="social">
+  <div class="section-label">Follow us</div>
+  <div class="section-title">Social Media</div>
+  <div class="social-grid">
+    <a class="social-btn" href="https://instagram.com/grandprix.miami" target="_blank" rel="noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      @grandprix.miami
+    </a>
+    <a class="social-btn" href="https://facebook.com/grandprix.miami" target="_blank" rel="noreferrer">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      @grandprix.miami
+    </a>
+    <a class="social-btn" href="https://www.google.com/maps/place/Grand+Prix+Accesories+LLC" target="_blank" rel="noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      Google · 4.8 ★
+    </a>
+  </div>
+</section>
 
-    vinInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") document.getElementById("decodeBtn").click();
-    });
-  </script>
+<hr class="divider"/>
+
+<!-- VIN DECODER -->
+<section class="section" id="vin">
+  <div class="section-label">Installer tool</div>
+  <div class="section-title">VIN Decoder</div>
+  <div class="vin-wrap">
+    <label for="vinInput">Enter 17-character VIN</label>
+    <input class="vin-input" id="vinInput" maxlength="17" placeholder="1HGBH41JXMN109186" autocomplete="off" spellcheck="false"/>
+    <div class="vin-btns">
+      <button class="vin-decode" id="decodeBtn">Decode VIN</button>
+      <button class="vin-clear" id="clearBtn">Clear</button>
+    </div>
+    <div class="vin-status" id="vinStatus">Ready.</div>
+    <div class="vin-result" id="vinResult">
+      <div class="kv" id="vinKV"></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px">Data source: NHTSA public API. Some trims/body styles may have limited data.</p>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+  <div class="section-label">Get in touch</div>
+  <div class="section-title">Contact Us</div>
+  <div class="contact-grid">
+    <div class="contact-form">
+      <label for="cname">Your Name</label>
+      <input id="cname" placeholder="John Smith"/>
+      <label for="cphone">Phone Number</label>
+      <input id="cphone" placeholder="(305) 555-1234"/>
+      <label for="cmsg">Message</label>
+      <textarea id="cmsg" rows="4" placeholder="Car year/make/model + what you want (tint %, type of film, etc.)"></textarea>
+      <button class="send-btn" onclick="handleContact()">Send Message →</button>
+    </div>
+    <div class="contact-info">
+      <div class="info-card">
+        <div class="info-card-label">Phone / Text</div>
+        <div class="info-card-val"><a href="tel:+17865238793">(786) 523-8793</a></div>
+        <div class="info-card-sub">Mon – Sat · 9 AM – 5 PM</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Email</div>
+        <div class="info-card-val"><a href="mailto:grandprixaccesoriesllc@gmail.com" style="color:var(--accent2);font-size:13px">grandprixaccesoriesllc@gmail.com</a></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Service Area</div>
+        <div class="info-card-val" style="font-size:15px">Miami Dade &amp; Broward County</div>
+        <div class="info-card-sub">We come to your location</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Book Online</div>
+        <div class="info-card-val">
+          <a href="/schedule.html" target="_blank" style="color:var(--accent)">Schedule Appointment →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Grand Prix Accessories LLC</strong> · Miami Window Tinting<br>
+  <span id="fyear"></span> · <a href="tel:+17865238793" style="color:var(--accent)">(786) 523-8793</a>
+</footer>
+
+<script>
+document.getElementById('fyear').textContent = '© ' + new Date().getFullYear();
+
+function handleContact(){
+  const name = document.getElementById('cname').value.trim();
+  const phone = document.getElementById('cphone').value.trim();
+  const msg = document.getElementById('cmsg').value.trim();
+  if(!name||!phone){alert('Please enter your name and phone number.');return;}
+  const body = encodeURIComponent('Name: '+name+'\nPhone: '+phone+'\nMessage: '+msg);
+  window.location.href = 'mailto:grandprixaccesoriesllc@gmail.com?subject=Appointment Request - Grand Prix Accessories&body='+body;
+}
+
+const vinInput = document.getElementById('vinInput');
+const statusEl = document.getElementById('vinStatus');
+const resultBox = document.getElementById('vinResult');
+const kvEl = document.getElementById('vinKV');
+
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  vinInput.value='';kvEl.innerHTML='';resultBox.style.display='none';
+  statusEl.textContent='Ready.';vinInput.focus();
+});
+
+document.getElementById('decodeBtn').addEventListener('click', async()=>{
+  const vin=(vinInput.value||'').trim().toUpperCase();
+  if(vin.length!==17){statusEl.textContent='VIN must be 17 characters.';resultBox.style.display='none';return;}
+  statusEl.textContent='Decoding…';resultBox.style.display='none';kvEl.innerHTML='';
+  try{
+    const res=await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${vin}?format=json`);
+    const data=await res.json();
+    const r=data?.Results?.[0];
+    if(!r){statusEl.textContent='No results returned.';return;}
+    const fields=[
+      ['Year',r.ModelYear],['Make',r.Make],['Model',r.Model],['Trim',r.Trim],
+      ['Body Class',r.BodyClass],['Doors',r.Doors],['Drive Type',r.DriveType],
+      ['Engine',[r.EngineCylinders,r.DisplacementL,r.FuelTypePrimary].filter(Boolean).join(' | ')],
+      ['Vehicle Type',r.VehicleType],
+      ['Plant',[r.PlantCity,r.PlantState,r.PlantCountry].filter(Boolean).join(', ')],
+    ];
+    kvEl.innerHTML=fields.filter(([k,v])=>v&&String(v).trim()&&v!=='Not Applicable')
+      .map(([k,v])=>`<div>${k}</div><div><b>${String(v)}</b></div>`).join('');
+    if(!kvEl.innerHTML)kvEl.innerHTML=`<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, limited data.</b></div>`;
+    resultBox.style.display='block';statusEl.textContent='Done.';
+  }catch(e){statusEl.textContent='Error decoding VIN. Try again.';}
+});
+
+vinInput.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('decodeBtn').click();});
+</script>
 </body>
 </html>
