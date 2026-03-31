@@ -468,16 +468,15 @@ async function delAppt(id){
 
 async function updField(id,field,val){
   const a=appts.find(x=>x.id===id);if(!a)return;
-  a[field]=val;
-  const update={[field]:field==='monto'||field==='tip'||field==='directo'?flt(val):val};
+  a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
+  const update={[field]:a[field]};
   if(field==='monto'||field==='inst'){
     a.com=calcCom(a.monto,a.inst);
     update.com=a.com;
-    const cel=document.getElementById('com-'+id);
-    if(cel)cel.textContent=a.com>0?'$'+a.com.toFixed(2)+' ('+(a.inst==='angelo_solo'?'40%':'25%')+')':'—';
   }
   await dbUpdate(id,update);
-  updateStats();
+  await loadAndRender();
+  if(curView==='mes'&&selDate)showCalDay(selDate);
   if(curView==='agenda')renderAgenda();
 }
 
