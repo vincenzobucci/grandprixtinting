@@ -418,9 +418,9 @@ function showDay(ds) {
       if (a.addr) html += '<div class="anot">' + a.addr + '</div>';
       if (a.notes) html += '<div class="anot">' + a.notes + '</div>';
       html += '</div><div class="aacts">';
-      html += '<button class="ab ok" onclick="toggleDone('' + a.id + '')">' + (a.done ? "Reabrir" : "Listo") + '</button>';
-      html += '<button class="ab ed" onclick="openEditForm('' + a.id + '')">Editar</button>';
-      html += '<button class="ab dl" onclick="delAppt('' + a.id + '')">Borrar</button>';
+      html += '<button class="ab ok" onclick="toggleDone(\'' + a.id + '\')">' + (a.done ? 'Reabrir' : 'Listo') + '</button>';
+      html += '<button class="ab ed" onclick="openEditForm(\'' + a.id + '\')">Editar</button>';
+      html += '<button class="ab dl" onclick="delAppt(\'' + a.id + '\')">Borrar</button>';
       html += '</div></div>';
     }
     cont.innerHTML = html;
