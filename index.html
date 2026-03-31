@@ -359,7 +359,6 @@
     <a href="#reviews">Reviews</a>
     <a href="#vin">VIN Decoder</a>
     <a href="#contact">Contact</a>
-    <a href="/schedule.html" target="_blank">Schedule</a>
   </div>
   <a class="nav-cta" href="tel:+17865238793">📞 Call Now</a>
 </nav>
@@ -374,7 +373,7 @@
   <div class="hero-ctas">
     <a class="btn-primary" href="tel:+17865238793">📞 Call or Text</a>
     <a class="btn-ghost" href="#contact">📅 Request Appointment</a>
-    <a class="btn-ghost" href="/schedule.html" target="_blank">🗓 Book Online</a>
+
   </div>
   <p class="hero-tip">Mon – Sat · 9 AM to 5 PM</p>
   <div class="hero-stats">
@@ -612,19 +611,14 @@
       </div>
       <div class="info-card">
         <div class="info-card-label">Email</div>
-        <div class="info-card-val"><a href="mailto:grandprixaccesoriesllc@gmail.com" style="color:var(--accent2);font-size:13px">grandprixaccesoriesllc@gmail.com</a></div>
+        <div class="info-card-val"><a href="/cdn-cgi/l/email-protection#ddbaafbcb3b9adafb4a5bcbebeb8aeb2afb4b8aeb1b1be9dbab0bcb4b1f3beb2b0" style="color:var(--accent2);font-size:13px"><span class="__cf_email__" data-cfemail="bfd8cdded1dbcfcdd6c7dedcdcdaccd0cdd6daccd3d3dcffd8d2ded6d391dcd0d2">[email&#160;protected]</span></a></div>
       </div>
       <div class="info-card">
         <div class="info-card-label">Service Area</div>
         <div class="info-card-val" style="font-size:15px">Miami Dade &amp; Broward County</div>
         <div class="info-card-sub">We come to your location</div>
       </div>
-      <div class="info-card">
-        <div class="info-card-label">Book Online</div>
-        <div class="info-card-val">
-          <a href="/schedule.html" target="_blank" style="color:var(--accent)">Schedule Appointment →</a>
-        </div>
-      </div>
+
     </div>
   </div>
 </section>
@@ -635,7 +629,7 @@
   <span id="fyear"></span> · <a href="tel:+17865238793" style="color:var(--accent)">(786) 523-8793</a>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 document.getElementById('fyear').textContent = '© ' + new Date().getFullYear();
 
 function handleContact(){
@@ -676,11 +670,3 @@ document.getElementById('decodeBtn').addEventListener('click', async()=>{
     kvEl.innerHTML=fields.filter(([k,v])=>v&&String(v).trim()&&v!=='Not Applicable')
       .map(([k,v])=>`<div>${k}</div><div><b>${String(v)}</b></div>`).join('');
     if(!kvEl.innerHTML)kvEl.innerHTML=`<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, limited data.</b></div>`;
-    resultBox.style.display='block';statusEl.textContent='Done.';
-  }catch(e){statusEl.textContent='Error decoding VIN. Try again.';}
-});
-
-vinInput.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('decodeBtn').click();});
-</script>
-</body>
-</html>
