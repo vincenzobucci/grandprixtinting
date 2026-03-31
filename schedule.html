@@ -403,7 +403,7 @@ function showDay(ds) {
   document.getElementById("dpa-btn").onclick = function() { openForm(ds); };
   var cont = document.getElementById("dapts");
   if (!dayA.length) {
-    cont.innerHTML = '<div class="noapt">No hay citas.<br><span onclick="openForm('' + ds + '')">Agregar aqui</span></div>';
+    cont.innerHTML = '<div class="noapt">No hay citas.<br><span onclick="openForm(\''+ds+'\')">Agregar aqui</span></div>';
   } else {
     var html = "";
     for (var j = 0; j < dayA.length; j++) {
