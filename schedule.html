@@ -247,7 +247,7 @@
           <div class="dp-sum" id="dp-sum"></div>
           <div class="tscroll">
             <table><thead><tr>
-              <th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+              <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
               <th>Instalador</th><th>Monto</th><th>Comisión Angelo</th>
               <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th></th>
             </tr></thead><tbody id="cal-tbody"></tbody></table>
@@ -276,13 +276,23 @@
     <div class="frow">
       <div class="fg"><label>Vehículo</label><input id="f-car" placeholder="Toyota Camry 2022"/></div>
       <div class="fg"><label>Servicio</label>
-        <select id="f-service">
+        <select id="f-service" onchange="updPrev();toggleCustomService()">
           <option value="">Seleccionar...</option>
-          <option>Tint completo</option><option>Parabrisas</option>
-          <option>Ventanas laterales</option><option>Ventana trasera</option>
-          <option>Remoción de tint</option><option>Otro</option>
+          <option>Tint completo</option>
+          <option>Parabrisas</option>
+          <option>Match</option>
+          <option>Lados</option>
+          <option>Atras</option>
+          <option>Ventanas laterales</option>
+          <option>Ventana trasera</option>
+          <option>Remoción de tint</option>
+          <option value="Otro">Otro</option>
         </select>
       </div>
+    </div>
+    <div class="fg" id="fg-custom-service" style="display:none">
+      <label>Describe el servicio</label>
+      <input id="f-service-custom" placeholder="Escribe el servicio aquí..."/>
     </div>
     <div class="frow">
       <div class="fg"><label>Monto ($)</label><input type="number" id="f-monto" placeholder="0.00" inputmode="decimal" oninput="updPrev()"/></div>
@@ -291,7 +301,8 @@
           <option value="">Seleccionar...</option>
           <option value="angelo_solo">Angelo solo — 40%</option>
           <option value="angelo_conmigo">Angelo + yo — 25%</option>
-          <option value="yo">Solo yo — 0%</option>
+          <option value="pino">Pino — 40%</option>
+          <option value="angelo_pino">Angelo y Pino — 25%</option>
         </select>
       </div>
     </div>
@@ -301,13 +312,14 @@
         <select id="f-pago"><option value="">—</option><option value="si">Sí</option><option value="no">No</option></select>
       </div>
       <div class="fg"><label>Forma de pago</label>
-        <select id="f-forma"><option value="">—</option><option>Cash</option><option>Zelle</option><option>Tarjeta</option><option>Cheque</option><option>Otro</option></select>
+        <select id="f-forma"><option value="">—</option><option>Cash</option><option>Zelle</option><option>Tarjeta</option><option>Cheque</option><option>Quickbooks</option><option>Otro</option></select>
       </div>
     </div>
     <div class="frow">
       <div class="fg"><label>Tip ($)</label><input type="number" id="f-tip" placeholder="0.00" inputmode="decimal"/></div>
       <div class="fg"><label>Pagó directo a Angelo ($)</label><input type="number" id="f-directo" placeholder="0.00" inputmode="decimal"/></div>
     </div>
+    <div class="fg"><label>Dirección</label><input id="f-addr" placeholder="123 SW 8th St, Miami FL 33130"/></div>
     <button class="bsave" onclick="saveAppt()">Guardar cita</button>
     <span class="bcancel" onclick="closeForm()">Cancelar</span>
   </div>
@@ -405,14 +417,27 @@ async function dbDelete(id){
 function calcCom(m,i){
   if(i==='angelo_solo')return flt(m)*0.40;
   if(i==='angelo_conmigo')return flt(m)*0.25;
+  if(i==='pino')return flt(m)*0.40;
+  if(i==='angelo_pino')return flt(m)*0.25;
   return 0;
 }
 function updPrev(){
   const m=document.getElementById('f-monto').value;
   const i=document.getElementById('f-inst').value;
   const el=document.getElementById('cprev');
-  if(!m||!i||i==='yo'){el.textContent='Sin comisión para Angelo';return;}
-  el.textContent='Comisión Angelo ('+(i==='angelo_solo'?40:25)+'%): $'+calcCom(m,i).toFixed(2);
+  if(!m||!i){el.textContent='Selecciona instalador y monto';return;}
+  const pct=(i==='angelo_solo'||i==='pino')?40:25;
+  const com=calcCom(m,i);
+  if(com===0){el.textContent='Sin comisión';return;}
+  const who=(i==='pino'||i==='angelo_pino')?'Pino':'Angelo';
+  el.textContent='Comisión '+who+' ('+pct+'%): $'+com.toFixed(2);
+}
+
+function toggleCustomService(){
+  const sel=document.getElementById('f-service');
+  const fg=document.getElementById('fg-custom-service');
+  fg.style.display=sel.value==='Otro'?'block':'none';
+  if(sel.value!=='Otro') document.getElementById('f-service-custom').value='';
 }
 function openForm(dv){
   editId=null;
@@ -421,6 +446,9 @@ function openForm(dv){
   document.getElementById('f-time').value='09:00';
   ['f-name','f-car','f-monto','f-tip','f-directo'].forEach(id=>document.getElementById(id).value='');
   ['f-service','f-inst','f-pago','f-forma'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-addr').value='';
+  document.getElementById('f-service-custom').value='';
+  document.getElementById('fg-custom-service').style.display='none';
   document.getElementById('cprev').textContent='Selecciona instalador y monto';
   document.getElementById('modal-overlay').className='modal-overlay open';
 }
@@ -439,6 +467,16 @@ function openEdit(id){
   document.getElementById('f-forma').value=a.forma||'';
   document.getElementById('f-tip').value=a.tip||'';
   document.getElementById('f-directo').value=a.directo||'';
+  document.getElementById('f-addr').value=a.addr||'';
+  const knownServices=['Tint completo','Parabrisas','Match','Lados','Atras','Ventanas laterales','Ventana trasera','Remoción de tint','Otro',''];
+  if(a.service && !knownServices.includes(a.service)){
+    document.getElementById('f-service').value='Otro';
+    document.getElementById('f-service-custom').value=a.service;
+    document.getElementById('fg-custom-service').style.display='block';
+  } else {
+    document.getElementById('f-service').value=a.service||'';
+    document.getElementById('fg-custom-service').style.display='none';
+  }
   updPrev();
   document.getElementById('modal-overlay').className='modal-overlay open';
 }
@@ -451,15 +489,20 @@ async function saveAppt(){
   if(!name||!date){alert('Necesitas nombre y fecha.');return;}
   const inst=document.getElementById('f-inst').value;
   const monto=document.getElementById('f-monto').value;
+  const rawService=document.getElementById('f-service').value;
+  const customService=document.getElementById('f-service-custom').value.trim();
+  const finalService=rawService==='Otro'&&customService?customService:rawService;
   const obj={
     date,time:document.getElementById('f-time').value,
     name,car:document.getElementById('f-car').value.trim(),
-    service:document.getElementById('f-service').value,
+    service:finalService,
+    addr:document.getElementById('f-addr').value.trim(),
     monto:flt(monto),inst,com:calcCom(monto,inst),
     pago:document.getElementById('f-pago').value,
     forma:document.getElementById('f-forma').value,
     tip:flt(document.getElementById('f-tip').value),
-    directo:flt(document.getElementById('f-directo').value)
+    directo:flt(document.getElementById('f-directo').value),
+    status:'pending'
   };
   document.querySelector('.bsave').textContent='Guardando...';
   if(editId){
@@ -517,26 +560,45 @@ function buildTableRows(da,tbodyId,sumElId){
       `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
       `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
   }
-  if(!da.length){tbody.innerHTML='<tr><td colspan="11" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
+  if(!da.length){tbody.innerHTML='<tr><td colspan="12" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
   tbody.innerHTML=da.map(a=>{
-    const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
-    const instLabel=a.inst==='angelo_solo'?'Angelo solo (40%)':a.inst==='angelo_conmigo'?'Angelo + yo (25%)':a.inst==='yo'?'Solo yo':'—';
-    const pagoLabel=a.pago==='si'?'✓ Sí':a.pago==='no'?'✗ No':'—';
-    const tipVal=flt(a.tip)>0?`$${flt(a.tip).toFixed(2)}`:'—';
-    const directoVal=flt(a.directo)>0?`$${flt(a.directo).toFixed(2)}`:'—';
-    const montoVal=flt(a.monto)>0?`$${flt(a.monto).toFixed(2)}`:'—';
-    return `<tr style="cursor:pointer" onclick="openEdit('${a.id}')">
-      <td class="td-name">${a.name}</td>
+    const id=a.id;
+    const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'||a.inst==='pino'?'40%':'25%'})`:'—';
+    const instOpts=`<option value="">—</option>`+
+      [['angelo_solo','Angelo solo (40%)'],['angelo_conmigo','Angelo + yo (25%)'],['pino','Pino (40%)'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
+        `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
+    const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
+    const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
+    const status=a.status||'pending';
+    const isDone=status==='done';
+    const isCancel=status==='cancelled';
+    const nameColor=isDone?'#63c462':isCancel?'#f09595':'var(--accent2)';
+    const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
+    return `<tr>
+      <td style="min-width:30px;text-align:center">
+        <select class="tsel" style="width:70px;font-size:11px" onchange="updField('${id}','status',this.value)">
+          <option value="pending"${status==='pending'?' selected':''}>⏳</option>
+          <option value="done"${isDone?' selected':''}>✅ Hecho</option>
+          <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
+        </select>
+      </td>
+      <td class="td-name" onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:110px">${a.name}${addrLink}</td>
       <td class="td-time">${a.time||'—'}</td>
-      <td style="white-space:nowrap;min-width:120px">${a.car||''}${a.service?' · '+a.service:''}</td>
-      <td style="min-width:130px;font-size:12px">${instLabel}</td>
-      <td style="font-weight:600;color:var(--accent)">${montoVal}</td>
-      <td class="td-com" id="com-${a.id}">${ct}</td>
-      <td>${pagoLabel}</td>
-      <td style="font-size:12px">${a.forma||'—'}</td>
-      <td>${tipVal}</td>
-      <td>${directoVal}</td>
-      <td><button class="delbtn" onclick="event.stopPropagation();delAppt('${a.id}')">✕</button></td>
+      <td style="white-space:nowrap;min-width:110px;font-size:11px">${a.car||''}${a.service?' · '+a.service:''}</td>
+      <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
+      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px"
+        onblur="updField('${id}','monto',this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td class="td-com" id="com-${id}">${ct}</td>
+      <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
+      <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
+      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px"
+        onblur="updField('${id}','tip',this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px"
+        onblur="updField('${id}','directo',this.value)"
+        onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
     </tr>`;
   }).join('');
 }
@@ -636,7 +698,7 @@ function renderAgenda(){
         <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
       </div>
       <div class="tscroll"><table><thead><tr>
-        <th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+        <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
         <th>Instalador</th><th>Monto</th><th>Comisión Angelo</th>
         <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th></th>
       </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
