@@ -489,9 +489,15 @@ async function updField(id,field,val){
   const a=appts.find(x=>x.id===id);if(!a)return;
   a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
   const update={[field]:a[field]};
+  if(field==='inst'){
+    // grab current monto from DOM input in case it was typed but not yet saved
+    const montoInput=document.querySelector(`input[onchange*="updField(${id},'monto"]`);
+    if(montoInput&&montoInput.value) a.monto=flt(montoInput.value);
+  }
   if(field==='monto'||field==='inst'){
     a.com=calcCom(a.monto,a.inst);
     update.com=a.com;
+    if(field==='inst') update.monto=a.monto;
   }
   await dbUpdate(id,update);
   await loadAndRender();
@@ -522,12 +528,12 @@ function buildTableRows(da,tbodyId,sumElId){
       <td class="td-time">${a.time||'—'}</td>
       <td style="white-space:nowrap;min-width:120px">${a.car||''}${a.service?' · '+a.service:''}</td>
       <td style="min-width:150px"><select class="tsel" onchange="updField(${a.id},'inst',this.value)"><option value="">—</option>${instOpts}</select></td>
-      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onchange="updField(${a.id},'monto',this.value)"/></td>
+      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onblur="updField(${a.id},'monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
       <td class="td-com" id="com-${a.id}">${ct}</td>
       <td><select class="tsel" style="min-width:65px" onchange="updField(${a.id},'pago',this.value)"><option value="">—</option>${pagoOpts}</select></td>
       <td><select class="tsel" style="min-width:85px" onchange="updField(${a.id},'forma',this.value)"><option value="">—</option>${formaOpts}</select></td>
-      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:62px" onchange="updField(${a.id},'tip',this.value)"/></td>
-      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:72px" onchange="updField(${a.id},'directo',this.value)"/></td>
+      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:62px" onblur="updField(${a.id},'tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:72px" onblur="updField(${a.id},'directo',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
       <td><button class="delbtn" onclick="delAppt(${a.id})">✕</button></td>
     </tr>`;
   }).join('');
