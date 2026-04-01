@@ -300,8 +300,7 @@
         <select id="f-inst" onchange="updPrev()">
           <option value="">Seleccionar...</option>
           <option value="angelo_solo">Angelo solo — 40%</option>
-          <option value="angelo_conmigo">Angelo + yo — 25%</option>
-          <option value="pino">Pino — 40%</option>
+          <option value="pino">Pino</option>
           <option value="angelo_pino">Angelo y Pino — 25%</option>
         </select>
       </div>
@@ -416,8 +415,7 @@ async function dbDelete(id){
 // ─── FORM ────────────────────────────────────────────────────
 function calcCom(m,i){
   if(i==='angelo_solo')return flt(m)*0.40;
-  if(i==='angelo_conmigo')return flt(m)*0.25;
-  if(i==='pino')return flt(m)*0.40;
+  if(i==='pino')return 0;
   if(i==='angelo_pino')return flt(m)*0.25;
   return 0;
 }
@@ -426,10 +424,10 @@ function updPrev(){
   const i=document.getElementById('f-inst').value;
   const el=document.getElementById('cprev');
   if(!m||!i){el.textContent='Selecciona instalador y monto';return;}
-  const pct=(i==='angelo_solo'||i==='pino')?40:25;
   const com=calcCom(m,i);
-  if(com===0){el.textContent='Sin comisión';return;}
-  const who=(i==='pino'||i==='angelo_pino')?'Pino':'Angelo';
+  if(com===0){el.textContent='Sin comisión para este instalador';return;}
+  const pct=(i==='angelo_solo')?40:25;
+  const who=(i==='angelo_pino')?'Angelo y Pino':'Angelo';
   el.textContent='Comisión '+who+' ('+pct+'%): $'+com.toFixed(2);
 }
 
@@ -563,9 +561,9 @@ function buildTableRows(da,tbodyId,sumElId){
   if(!da.length){tbody.innerHTML='<tr><td colspan="12" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
   tbody.innerHTML=da.map(a=>{
     const id=a.id;
-    const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'||a.inst==='pino'?'40%':'25%'})`:'—';
+    const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
     const instOpts=`<option value="">—</option>`+
-      [['angelo_solo','Angelo solo (40%)'],['angelo_conmigo','Angelo + yo (25%)'],['pino','Pino (40%)'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
+      [['angelo_solo','Angelo solo (40%)'],['pino','Pino'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
         `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
     const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
     const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
