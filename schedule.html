@@ -273,6 +273,7 @@
       <div class="fg"><label>Hora</label><input type="time" id="f-time"/></div>
     </div>
     <div class="fg"><label>Nombre del cliente</label><input id="f-name" placeholder="Nombre completo"/></div>
+    <div class="fg"><label>Teléfono</label><input id="f-phone" type="tel" placeholder="(305) 555-1234" inputmode="tel"/></div>
     <div class="frow">
       <div class="fg"><label>Vehículo</label><input id="f-car" placeholder="Toyota Camry 2022"/></div>
       <div class="fg"><label>Servicio</label>
@@ -444,6 +445,7 @@ function openForm(dv){
   document.getElementById('f-time').value='09:00';
   ['f-name','f-car','f-monto','f-tip','f-directo'].forEach(id=>document.getElementById(id).value='');
   ['f-service','f-inst','f-pago','f-forma'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-phone').value='';
   document.getElementById('f-addr').value='';
   document.getElementById('f-service-custom').value='';
   document.getElementById('fg-custom-service').style.display='none';
@@ -457,6 +459,7 @@ function openEdit(id){
   document.getElementById('f-date').value=a.date||'';
   document.getElementById('f-time').value=a.time||'';
   document.getElementById('f-name').value=a.name||'';
+  document.getElementById('f-phone').value=a.phone||'';
   document.getElementById('f-car').value=a.car||'';
   document.getElementById('f-service').value=a.service||'';
   document.getElementById('f-monto').value=a.monto||'';
@@ -465,6 +468,7 @@ function openEdit(id){
   document.getElementById('f-forma').value=a.forma||'';
   document.getElementById('f-tip').value=a.tip||'';
   document.getElementById('f-directo').value=a.directo||'';
+  document.getElementById('f-phone').value=a.phone||'';
   document.getElementById('f-addr').value=a.addr||'';
   const knownServices=['Tint completo','Parabrisas','Match','Lados','Atras','Ventanas laterales','Ventana trasera','Remoción de tint','Otro',''];
   if(a.service && !knownServices.includes(a.service)){
@@ -494,6 +498,7 @@ async function saveAppt(){
     date,time:document.getElementById('f-time').value,
     name,car:document.getElementById('f-car').value.trim(),
     service:finalService,
+    phone:document.getElementById('f-phone').value.trim(),
     addr:document.getElementById('f-addr').value.trim(),
     monto:flt(monto),inst,com:calcCom(monto,inst),
     pago:document.getElementById('f-pago').value,
@@ -571,7 +576,9 @@ function buildTableRows(da,tbodyId,sumElId){
     const isDone=status==='done';
     const isCancel=status==='cancelled';
     const nameColor=isDone?'#63c462':isCancel?'#f09595':'var(--accent2)';
+    const phoneLink=a.phone?`<a href="tel:${a.phone}" style="color:var(--muted);font-size:11px;display:block;margin-top:1px">📞 ${a.phone}</a>`:'';
     const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
+    const extraInfo=phoneLink+addrLink;
     return `<tr>
       <td style="min-width:30px;text-align:center">
         <select class="tsel" style="width:70px;font-size:11px" onchange="updField('${id}','status',this.value)">
