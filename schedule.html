@@ -576,13 +576,13 @@ function buildTableRows(da,tbodyId,sumElId){
     const isDone=status==='done';
     const isCancel=status==='cancelled';
     const nameColor=isDone?'#63c462':isCancel?'#f09595':'var(--accent2)';
-    const phoneLink=a.phone?`<a href="tel:${a.phone}" style="color:var(--muted);font-size:11px;display:block;margin-top:1px">📞 ${a.phone}</a>`:'';
+    const phoneLink=a.phone?`<a href="tel:${a.phone}" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📞 ${a.phone}</a>`:'';
     const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
     const extraInfo=phoneLink+addrLink;
     return `<tr>
       <td style="min-width:30px;text-align:center">
         <select class="tsel" style="width:70px;font-size:11px" onchange="updField('${id}','status',this.value)">
-          <option value="pending"${status==='pending'?' selected':''}>⏳</option>
+          <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
           <option value="done"${isDone?' selected':''}>✅ Hecho</option>
           <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
         </select>
