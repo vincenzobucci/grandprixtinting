@@ -89,7 +89,7 @@
     .dp-sum{background:rgba(0,0,0,0.2);padding:8px 16px;display:flex;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--cb)}
     .sum-i{font-size:11px;color:var(--accent2)}.sum-i span{font-weight:700}
     .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-    table{width:100%;border-collapse:collapse;min-width:860px}
+    table{width:100%;border-collapse:collapse;min-width:800px}
     thead tr{background:rgba(255,255,255,0.03);border-bottom:1px solid var(--cb)}
     th{padding:9px 11px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;border-right:0.5px solid var(--cb);text-transform:uppercase;letter-spacing:0.3px}
     th:last-child{border-right:none}
@@ -247,9 +247,9 @@
           <div class="dp-sum" id="dp-sum"></div>
           <div class="tscroll">
             <table><thead><tr>
-              <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+              <th>Estado</th><th>Cliente</th><th>Hora</th>
               <th>Instalador</th><th>Monto</th><th>Comisión Angelo</th>
-              <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th></th>
+              <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th>Vehículo / Servicio</th><th></th>
             </tr></thead><tbody id="cal-tbody"></tbody></table>
           </div>
         </div>
@@ -580,16 +580,19 @@ function buildTableRows(da,tbodyId,sumElId){
     const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
     const extraInfo=phoneLink+addrLink;
     return `<tr>
-      <td style="min-width:30px;text-align:center">
-        <select class="tsel" style="width:70px;font-size:11px" onchange="updField('${id}','status',this.value)">
+      <td style="min-width:80px;text-align:center">
+        <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
           <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
           <option value="done"${isDone?' selected':''}>✅ Hecho</option>
           <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
         </select>
       </td>
-      <td class="td-name" onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:160px;max-width:200px;word-break:break-word">${a.name}${addrLink}</td>
+      <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+        <div style="font-weight:600;font-size:13px">${a.name}</div>
+        ${a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:3px;text-decoration:none">📍 ${a.addr}</a>`:''}
+        ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
+      </td>
       <td class="td-time">${a.time||'—'}</td>
-      <td style="white-space:nowrap;min-width:110px;font-size:11px">${a.car||''}${a.service?' · '+a.service:''}</td>
       <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
       <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px"
         onblur="updField('${id}','monto',this.value)"
@@ -603,6 +606,7 @@ function buildTableRows(da,tbodyId,sumElId){
       <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px"
         onblur="updField('${id}','directo',this.value)"
         onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td style="min-width:140px;max-width:220px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
       <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
     </tr>`;
   }).join('');
@@ -703,9 +707,9 @@ function renderAgenda(){
         <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
       </div>
       <div class="tscroll"><table><thead><tr>
-        <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+        <th>Estado</th><th>Cliente</th><th>Hora</th>
         <th>Instalador</th><th>Monto</th><th>Comisión Angelo</th>
-        <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th></th>
+        <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th>Vehículo / Servicio</th><th></th>
       </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
     } else {
       html+=`<div class="no-appt-day">Sin citas este día</div>`;
