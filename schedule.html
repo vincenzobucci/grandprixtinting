@@ -587,7 +587,7 @@ function buildTableRows(da,tbodyId,sumElId){
           <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
         </select>
       </td>
-      <td class="td-name" onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:110px">${a.name}${addrLink}</td>
+      <td class="td-name" onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:160px;max-width:200px;word-break:break-word">${a.name}${addrLink}</td>
       <td class="td-time">${a.time||'—'}</td>
       <td style="white-space:nowrap;min-width:110px;font-size:11px">${a.car||''}${a.service?' · '+a.service:''}</td>
       <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
