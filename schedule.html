@@ -255,8 +255,8 @@ td:last-child{border-right:none}
       <div class="tscroll">
         <table><thead><tr>
           <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
-          <th>Instalador</th><th>Monto</th><th>Comisión Angelo</th>
-          <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th></th>
+          <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
+          <th>Tip $</th><th>Directo Angelo $</th><th></th>
         </tr></thead><tbody id="cal-tbody"></tbody></table>
       </div>
     </div>
@@ -603,14 +603,13 @@ function buildTableRows(da,tbodyId,sumElId){
         ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
       </td>
       <td class="td-time">${a.time||'—'}</td>
-      <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
-      <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
-      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px"
-        onblur="updField('${id}','monto',this.value)"
-        onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td class="td-com" id="com-${id}">${ct}</td>
+      <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px"
+        onblur="updField('${id}','monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
       <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
       <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
+      <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>td>
+      <td class="td-com" id="com-${id}">${ct}</td>
+
       <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px"
         onblur="updField('${id}','tip',this.value)"
         onkeydown="if(event.key==='Enter')this.blur()"/></td>
