@@ -1331,7 +1331,6 @@ function render(){
   updateStats();
   if(curView==='agenda')renderAgenda();
 }
-
 // ─── REALTIME ────────────────────────────────────────────────
 sb.channel('appointments-changes')
   .on('postgres_changes',{event:'*',schema:'public',table:'appointments'},()=>{
