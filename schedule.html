@@ -768,7 +768,7 @@ async function calcPreviousUnpaidWeeks(currentWeekStart) {
     const key=wn[wk].startDs;
     // Check if explicitly marked as paid (weekPaid[key] === true)
     const isMarkedAsPaid = weekPaid[key] === true;
-    // Include ALL weeks with non-zero neto (positive OR negative) if not paid
+    // Include ALL weeks with non-zero neto (positive OR negative) if not paid and before current week
     if(!isMarkedAsPaid && wn[wk].neto !== 0 && key < currentWeekStart){
       accumulated += wn[wk].neto;
     }
@@ -830,7 +830,16 @@ async function renderAgenda(){
 
     if(dow===0){
       const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
-      const accumulated = await calcPreviousUnpaidWeeks(wk);
+      
+      // Calculate the Monday that starts this week (for proper "previous weeks" calculation)
+      const currentWeekStart = (() => {
+        const currentDate = new Date(curYear, curMonth, d); // d is the current Sunday
+        const monday = new Date(currentDate);
+        monday.setDate(currentDate.getDate() - 6); // Sunday - 6 days = Monday
+        return mkDs(monday.getFullYear(), monday.getMonth(), monday.getDate());
+      })();
+      
+      const accumulated = await calcPreviousUnpaidWeeks(currentWeekStart);
       const totalWithAccumulated = net + accumulated;
       html+=`<div class="week-total">
         <div class="wt-title">Resumen semana · ${wN} cita${wN!==1?'s':''}</div>
@@ -856,7 +865,17 @@ async function renderAgenda(){
 
   if(new Date(curYear,curMonth,dim).getDay()!==0&&(wN>0||wM>0)){
     const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
-    const accumulated = await calcPreviousUnpaidWeeks(wk);
+    
+    // Calculate the Monday that starts this week (for proper "previous weeks" calculation)
+    const currentWeekStart = (() => {
+      const lastDay = new Date(curYear, curMonth, dim);
+      const dow = lastDay.getDay();
+      const monday = new Date(lastDay);
+      monday.setDate(lastDay.getDate() - dow + 1); // Get Monday of this week
+      return mkDs(monday.getFullYear(), monday.getMonth(), monday.getDate());
+    })();
+    
+    const accumulated = await calcPreviousUnpaidWeeks(currentWeekStart);
     const totalWithAccumulated = net + accumulated;
     html+=`<div class="week-total">
       <div class="wt-title">Resumen semana parcial · ${wN} cita${wN!==1?'s':''}</div>
