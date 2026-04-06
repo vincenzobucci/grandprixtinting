@@ -762,14 +762,14 @@ async function calcPreviousUnpaidWeeks(currentWeekStart) {
     if(a.date<wn[wk].startDs)wn[wk].startDs=a.date;
   });
   
-  // Sum unpaid weeks that are before currentWeekStart
+  // Sum ALL unpaid weeks before currentWeekStart (both positive AND negative)
   let accumulated = 0;
   Object.keys(wn).forEach(wk=>{
     const key=wn[wk].startDs;
-    // FIXED: Check if explicitly marked as paid (weekPaid[key] === true)
-    // If not explicitly marked as paid, consider it unpaid
+    // Check if explicitly marked as paid (weekPaid[key] === true)
     const isMarkedAsPaid = weekPaid[key] === true;
-    if(!isMarkedAsPaid && wn[wk].neto>0 && key < currentWeekStart){
+    // Include ALL weeks with non-zero neto (positive OR negative) if not paid
+    if(!isMarkedAsPaid && wn[wk].neto !== 0 && key < currentWeekStart){
       accumulated += wn[wk].neto;
     }
   });
@@ -839,12 +839,12 @@ async function renderAgenda(){
           <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
           <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
           <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
-          ${accumulated > 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">Acumulado semanas anteriores</div></div>` : ''}
+          ${accumulated !== 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">${accumulated > 0 ? 'Acumulado semanas anteriores' : 'Angelo tiene crédito de semanas anteriores'}</div></div>` : ''}
         </div>
         <div class="wt-paid-row">
           <div>
             <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
-            ${accumulated > 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Total con acumulado: $${totalWithAccumulated.toFixed(2)}</div>` : ''}
+            ${accumulated !== 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Balance total: $${totalWithAccumulated.toFixed(2)} ${totalWithAccumulated > 0 ? '(a pagar Angelo)' : '(Angelo te debe)'}</div>` : ''}
             <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
           </div>
           <button class="wt-paid-btn ${isPaid?'pagado':'pendiente'}" onclick="toggleWeekPaid('${wk}')">${isPaid?'✓ Pagado':'Marcar pagado'}</button>
@@ -865,12 +865,12 @@ async function renderAgenda(){
         <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
         <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
         <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
-        ${accumulated > 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">Acumulado semanas anteriores</div></div>` : ''}
+        ${accumulated !== 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">${accumulated > 0 ? 'Acumulado semanas anteriores' : 'Angelo tiene crédito de semanas anteriores'}</div></div>` : ''}
       </div>
       <div class="wt-paid-row">
         <div>
           <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
-          ${accumulated > 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Total con acumulado: $${totalWithAccumulated.toFixed(2)}</div>` : ''}
+          ${accumulated !== 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Balance total: $${totalWithAccumulated.toFixed(2)} ${totalWithAccumulated > 0 ? '(a pagar Angelo)' : '(Angelo te debe)'}</div>` : ''}
           <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
         </div>
         <button class="wt-paid-btn ${isPaid?'pagado':'pendiente'}" onclick="toggleWeekPaid('${wk}')">${isPaid?'✓ Pagado':'Marcar pagado'}</button>
