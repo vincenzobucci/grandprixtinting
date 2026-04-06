@@ -365,10 +365,14 @@ let currentUser = null;
 let userType = null;
 
 function doLogin(){
+  console.log('doLogin called'); // Debug
   const u = document.getElementById('lu').value.trim().toLowerCase();
   const p = document.getElementById('lp').value;
+  console.log('User:', u, 'Pass length:', p.length); // Debug
   const err = document.getElementById('login-error');
+  console.log('USERS object:', USERS); // Debug
   if(USERS[u] && USERS[u]===p){
+    console.log('Login successful for:', u); // Debug
     currentUser = u;
     userType = u === 'alejandro' ? 'employee' : 'admin';
     try{sessionStorage.setItem('gp_user',u);}catch(e){}
@@ -379,6 +383,7 @@ function doLogin(){
     document.getElementById('user-badge').textContent=u;
     loadAndRender();
   } else {
+    console.log('Login failed'); // Debug
     err.className='login-error show';
     document.getElementById('lp').value='';
   }
@@ -910,6 +915,5 @@ sb.channel('appointments-changes')
   })
   .subscribe();
 </script>
-
 </body>
 </html>
