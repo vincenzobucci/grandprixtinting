@@ -420,6 +420,7 @@ async function loadAndRender(){
   if(error){showToast('Error cargando citas');console.error(error);return;}
   appts = data || [];
   render();
+  if(userType === 'admin') renderBalanceCard(); // Only show balance to admin
 }
 
 async function dbInsert(obj){
@@ -704,9 +705,27 @@ function calcAllWeekNetos(){
   return wn;
 }
 
-function renderBalanceCard(){
+async function renderBalanceCard(){
   const el=document.getElementById('balance-card');if(!el)return;
-  const wn=calcAllWeekNetos();
+  
+  // Get ALL appointments from database, not just current month
+  const {data,error} = await sb.from('appointments').select('*').order('date');
+  if(error){console.error('Error loading all appointments for balance:',error);return;}
+  const allAppts = data || [];
+  
+  // Calculate week netos from ALL appointments
+  const wn={};
+  allAppts.forEach(a=>{
+    if(!a.date)return;
+    const d=new Date(a.date+'T12:00');
+    const dow=d.getDay();
+    const sun=new Date(d);sun.setDate(d.getDate()+(dow===0?0:7-dow));
+    const wk=mkDs(sun.getFullYear(),sun.getMonth(),sun.getDate());
+    if(!wn[wk])wn[wk]={neto:0,startDs:a.date};
+    wn[wk].neto+=flt(a.com)+flt(a.tip)-flt(a.directo);
+    if(a.date<wn[wk].startDs)wn[wk].startDs=a.date;
+  });
+  
   let total=0;const pw=[];
   Object.keys(wn).forEach(wk=>{
     const key=wn[wk].startDs;
@@ -726,6 +745,7 @@ function renderBalanceCard(){
 
 function toggleWeekPaid(wk){
   weekPaid[wk]=!weekPaid[wk];saveWP();renderAgenda();
+  if(userType === 'admin') renderBalanceCard(); // Update balance for admin
   showToast(weekPaid[wk]?'Semana marcada como pagada':'Semana pendiente');
 }
 
