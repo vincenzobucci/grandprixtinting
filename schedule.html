@@ -10,13 +10,19 @@
   <style>
     :root{--bg:#080a0f;--card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--muted:#7a8299;--text:#eef0f8;--accent:#c8ff00;--accent2:#00d4ff;--r:16px}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-    a{color:inherit;text-decoration:none}
-    .blob1,.blob2{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:0.15}
-    .blob1{width:600px;height:400px;background:var(--accent2);top:-150px;left:-150px}
-    .blob2{width:500px;height:350px;background:var(--accent);bottom:-100px;right:-100px}
 
 ```
+.employee-hidden { display: none !important; }
+body.employee .add-btn, 
+body.employee #balance-card,
+body.employee .bottom-nav { display: none !important; }
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.blob1,.blob2{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:0.15}
+.blob1{width:600px;height:400px;background:var(--accent2);top:-150px;left:-150px}
+.blob2{width:500px;height:350px;background:var(--accent);bottom:-100px;right:-100px}
+
 /* LOGIN */
 #login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px}
 .login-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--cb);border-radius:24px;padding:36px 32px;position:relative;z-index:1;animation:fadeUp 0.5s ease both}
@@ -249,7 +255,7 @@ td:last-child{border-right:none}
     <div class="day-panel">
       <div class="dp-hdr">
         <span class="dp-title" id="dp-title"></span>
-        <button class="dp-add" id="dp-add-btn">+ Agregar</button>
+        ${userType === 'admin' ? '<button class="agenda-add-btn" onclick="event.stopPropagation();openForm(\'' + ds + '\')">+ Agregar</button>' : ''}</button>
       </div>
       <div class="dp-sum" id="dp-sum"></div>
       <div class="tscroll">
@@ -354,8 +360,10 @@ const SUPABASE_KEY = 'sb_publishable_JoNXZmoSh0DAMvuQ-aMP4Q_ibxuhsQ_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── AUTH ────────────────────────────────────────────────────
-const USERS = {'grandprixaccesoriesllc@gmail.com':'4698650'};
+const USERS = {'grandprixaccesoriesllc@gmail.com':'4698650','alejandro':'grandprix1234'};
 let currentUser = null;
+let userType = null;
+l;
 
 function doLogin(){
   const u = document.getElementById('lu').value.trim().toLowerCase();
@@ -363,10 +371,12 @@ function doLogin(){
   const err = document.getElementById('login-error');
   if(USERS[u] && USERS[u]===p){
     currentUser = u;
+    userType = u === 'alejandro' ? 'employee' : 'admin';
     try{sessionStorage.setItem('gp_user',u);}catch(e){}
     err.className='login-error';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
+    document.body.className = userType === 'employee' ? 'employee' : 'admin';
     document.getElementById('user-badge').textContent=u;
     loadAndRender();
   } else {
@@ -381,7 +391,8 @@ function doLogout(){
   document.getElementById('app').style.display='none';
 }
 (function(){
-  try{const u=sessionStorage.getItem('gp_user');if(u&&USERS[u]){currentUser=u;document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';document.getElementById('user-badge').textContent=u;loadAndRender();}}catch(e){}
+  try{const u=sessionStorage.getItem('gp_user');if(u&&USERS[u]){currentUser=u;document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';
+    document.body.className = userType === 'employee' ? 'employee' : 'admin';document.getElementById('user-badge').textContent=u;loadAndRender();}}catch(e){}
 })();
 document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
@@ -400,11 +411,25 @@ function flt(v){return parseFloat(v)||0;}
 function showToast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.className='toast show';setTimeout(()=>t.className='toast',2200);}
 
 // ─── SUPABASE CRUD ───────────────────────────────────────────
+
+function setTableHeaders() {
+  const mainHeader = document.getElementById('main-table-header');
+  if (mainHeader) {
+    if (userType === 'employee') {
+      mainHeader.innerHTML = '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Instalador</th>';
+    } else {
+      mainHeader.innerHTML = '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Tip $</th><th>Directo Angelo $</th><th></th>';
+    }
+  }
+}
+
 async function loadAndRender(){
   const {data,error} = await sb.from('appointments').select('*').order('date').order('time');
   if(error){showToast('Error cargando citas');console.error(error);return;}
   appts = data || [];
+  setTableHeaders();
   render();
+  renderBalanceCard(); // Show balance across all months
 }
 
 async function dbInsert(obj){
@@ -566,53 +591,77 @@ function buildTableRows(da,tbodyId,sumElId){
   const tbody=document.getElementById(tbodyId);
   let tm=0,tc=0,td=0,tt=0;
   da.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
-  if(sumElId){
+  if(sumElId && userType === 'admin'){
     document.getElementById(sumElId).innerHTML=
       `<div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>`+
       `<div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>`+
       `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
       `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
   }
-  if(!da.length){tbody.innerHTML='<tr><td colspan="12" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
+  if(!da.length){
+    const colspan = userType === 'employee' ? 5 : 12;
+    tbody.innerHTML=`<tr><td colspan="${colspan}" class="empty-r">No hay citas. ${userType === 'admin' ? 'Toca "+ Agregar" para crear una.' : ''}</td></tr>`;
+    return;
+  }
   tbody.innerHTML=da.map(a=>{
     const id=a.id;
     const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
     const instOpts=`<option value="">—</option>`+
       [['angelo_solo','Angelo solo (40%)'],['pino','Pino'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
         `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
-    const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
-    const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
     const status=a.status||'pending';
     const isDone=status==='done';
     const isCancel=status==='cancelled';
     const nameColor=isDone?'#63c462':isCancel?'#f09595':'var(--accent2)';
-    const phoneLink=a.phone?`<a href="tel:${a.phone}" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📞 ${a.phone}</a>`:'';
-    const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
-    const extraInfo=phoneLink+addrLink;
-    return `<tr>
-      <td style="min-width:80px;text-align:center">
-        <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
-          <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
-          <option value="done"${isDone?' selected':''}>✅ Hecho</option>
-          <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
-        </select>
-      </td>
-      <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
-        <div style="font-weight:600;font-size:13px">${a.name}</div>
-        ${a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:3px;text-decoration:none">📍 ${a.addr}</a>`:''}
-        ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
-      </td>
-      <td class="td-time">${a.time||'—'}</td>
-      <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
-      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onblur="updField('${id}','monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
-      <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
-      <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
-      <td class="td-com" id="com-${id}">${ct}</td>
-      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px" onblur="updField('${id}','directo',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
-    </tr>`;
+    
+    if(userType === 'employee') {
+      // Limited view for employees - only essential columns
+      return `<tr>
+        <td style="min-width:80px;text-align:center">
+          <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
+            <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
+            <option value="done"${isDone?' selected':''}>✅ Hecho</option>
+            <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
+          </select>
+        </td>
+        <td style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+          <div style="font-weight:600;font-size:13px">${a.name}</div>
+          ${a.addr?`<div style="color:var(--accent2);font-size:11px;margin-top:3px">📍 ${a.addr}</div>`:''}
+          ${a.phone?`<div style="color:var(--accent2);font-size:11px;margin-top:2px">📞 ${a.phone}</div>`:''}
+        </td>
+        <td class="td-time">${a.time||'—'}</td>
+        <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
+        <td style="min-width:130px;font-size:12px">${a.inst==='angelo_solo'?'Angelo solo':a.inst==='pino'?'Pino':a.inst==='angelo_pino'?'Angelo y Pino':'—'}</td>
+      </tr>`;
+    } else {
+      // Full admin view
+      const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
+      const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
+      return `<tr>
+        <td style="min-width:80px;text-align:center">
+          <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
+            <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
+            <option value="done"${isDone?' selected':''}>✅ Hecho</option>
+            <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
+          </select>
+        </td>
+        <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+          <div style="font-weight:600;font-size:13px">${a.name}</div>
+          ${a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:3px;text-decoration:none">📍 ${a.addr}</a>`:''}
+          ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
+        </td>
+        <td class="td-time">${a.time||'—'}</td>
+        <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
+        <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onblur="updField('${id}','monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
+        <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
+        <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
+        <td class="td-com" id="com-${id}">${ct}</td>
+        <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px" onblur="updField('${id}','directo',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
+      </tr>`;
+    }
   }).join('');
 }
 
@@ -648,9 +697,27 @@ function calcAllWeekNetos(){
   return wn;
 }
 
-function renderBalanceCard(){
+async function renderBalanceCard(){
   const el=document.getElementById('balance-card');if(!el)return;
-  const wn=calcAllWeekNetos();
+  
+  // Get ALL appointments from database, not just current month
+  const {data,error} = await sb.from('appointments').select('*').order('date');
+  if(error){console.error('Error loading all appointments for balance:',error);return;}
+  const allAppts = data || [];
+  
+  // Calculate week netos from ALL appointments
+  const wn={};
+  allAppts.forEach(a=>{
+    if(!a.date)return;
+    const d=new Date(a.date+'T12:00');
+    const dow=d.getDay();
+    const sun=new Date(d);sun.setDate(d.getDate()+(dow===0?0:7-dow));
+    const wk=mkDs(sun.getFullYear(),sun.getMonth(),sun.getDate());
+    if(!wn[wk])wn[wk]={neto:0,startDs:a.date};
+    wn[wk].neto+=flt(a.com)+flt(a.tip)-flt(a.directo);
+    if(a.date<wn[wk].startDs)wn[wk].startDs=a.date;
+  });
+  
   let total=0;const pw=[];
   Object.keys(wn).forEach(wk=>{
     const key=wn[wk].startDs;
@@ -669,7 +736,7 @@ function renderBalanceCard(){
 }
 
 function toggleWeekPaid(wk){
-  weekPaid[wk]=!weekPaid[wk];saveWP();renderAgenda();
+  weekPaid[wk]=!weekPaid[wk];saveWP();renderAgenda();renderBalanceCard();
   showToast(weekPaid[wk]?'Semana marcada como pagada':'Semana pendiente');
 }
 
@@ -710,12 +777,12 @@ function renderAgenda(){
         <div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>
         <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
       </div>
-      <div class="tscroll"><table><thead><tr>
-        <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
-        <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
-        <th>Tip $</th><th>Directo Angelo $</th><th></th>
-      </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
-    } else {
+      <div class="tscroll"><table><thead><tr class="agenda-header">
+        ${userType === 'employee' ? 
+          '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Instalador</th>' :
+          '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Tip $</th><th>Directo Angelo $</th><th></th>'
+        }
+      </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>   } else {
       html+=`<div class="no-appt-day">Sin citas este día</div>`;
     }
     html+='</div></div>';
