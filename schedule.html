@@ -798,7 +798,7 @@ async function renderAgenda(){
     const dow=dateObj.getDay();
     const isToday=ds===todayStr;
     const da=appts.filter(a=>a.date===ds).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-    da.forEach(a=>{wM+=flt(a.monto);wC+=flt(a.com);wD+=flt(a.directo);wT+=flt(a.tip);});
+    // Remove daily accumulation - now done weekly on Sunday
     wN+=da.length;if(!wK)wK=ds;
 
     html+=`<div class="agenda-day">
@@ -829,15 +829,35 @@ async function renderAgenda(){
     html+='</div></div>';
 
     if(dow===0){
+      // FIXED: Recalculate weekly totals to include ALL days of the week (including prev month)
+      const weekEndDate = new Date(curYear, curMonth, d);
+      const weekStartDate = new Date(weekEndDate);
+      weekStartDate.setDate(weekEndDate.getDate() - 6); // Sunday minus 6 = Monday
+      
+      // Reset and recalculate with complete week
+      wM=0;wC=0;wD=0;wT=0;wN=0;wK='';
+      
+      // Get all appointments for the complete week (Monday to Sunday)
+      for(let i = 0; i < 7; i++){
+        const weekDay = new Date(weekStartDate);
+        weekDay.setDate(weekStartDate.getDate() + i);
+        const weekDayStr = mkDs(weekDay.getFullYear(), weekDay.getMonth(), weekDay.getDate());
+        
+        const weekDayAppts = appts.filter(a => a.date === weekDayStr);
+        weekDayAppts.forEach(a => {
+          wM += flt(a.monto);
+          wC += flt(a.com);
+          wD += flt(a.directo);
+          wT += flt(a.tip);
+          wN++;
+        });
+        if(!wK || weekDayStr < wK) wK = weekDayStr;
+      }
+      
       const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
       
       // Calculate the Monday that starts this week (for proper "previous weeks" calculation)
-      const currentWeekStart = (() => {
-        const currentDate = new Date(curYear, curMonth, d); // d is the current Sunday
-        const monday = new Date(currentDate);
-        monday.setDate(currentDate.getDate() - 6); // Sunday - 6 days = Monday
-        return mkDs(monday.getFullYear(), monday.getMonth(), monday.getDate());
-      })();
+      const currentWeekStart = mkDs(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate());
       
       const accumulated = await calcPreviousUnpaidWeeks(currentWeekStart);
       const totalWithAccumulated = net + accumulated;
