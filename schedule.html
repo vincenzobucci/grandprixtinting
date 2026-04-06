@@ -766,7 +766,10 @@ async function calcPreviousUnpaidWeeks(currentWeekStart) {
   let accumulated = 0;
   Object.keys(wn).forEach(wk=>{
     const key=wn[wk].startDs;
-    if(!weekPaid[key] && wn[wk].neto>0 && key < currentWeekStart){
+    // FIXED: Check if explicitly marked as paid (weekPaid[key] === true)
+    // If not explicitly marked as paid, consider it unpaid
+    const isMarkedAsPaid = weekPaid[key] === true;
+    if(!isMarkedAsPaid && wn[wk].neto>0 && key < currentWeekStart){
       accumulated += wn[wk].neto;
     }
   });
