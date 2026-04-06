@@ -177,6 +177,17 @@ td:last-child{border-right:none}
 .bnav-top{background:rgba(255,255,255,0.05);border:1px solid var(--cb);color:var(--muted);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
 .bnav-top:hover{color:var(--text);background:rgba(255,255,255,0.1)}
 .toast.show{opacity:1}
+
+/* Employee restrictions */
+.employee .add-btn,
+.employee .dp-add,
+.employee .agenda-add-btn,
+.employee #balance-card,
+.employee .delbtn { display: none !important; }
+
+.employee .stats .scard:nth-child(2),
+.employee .stats .scard:nth-child(3),
+.employee .stats .scard:nth-child(4) { display: none !important; }
 ```
 
   </style>
@@ -254,10 +265,7 @@ td:last-child{border-right:none}
       </div>
       <div class="dp-sum" id="dp-sum"></div>
       <div class="tscroll">
-        <table><thead><tr>
-          <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
-          <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
-          <th>Tip $</th><th>Directo Angelo $</th><th></th>
+        <table><thead><tr id="day-table-headers">
         </tr></thead><tbody id="cal-tbody"></tbody></table>
       </div>
     </div>
@@ -355,8 +363,9 @@ const SUPABASE_KEY = 'sb_publishable_JoNXZmoSh0DAMvuQ-aMP4Q_ibxuhsQ_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── AUTH ────────────────────────────────────────────────────
-const USERS = {'grandprixaccesoriesllc@gmail.com':'4698650'};
+const USERS = {'grandprixaccesoriesllc@gmail.com':'4698650','alejandro':'grandprix1234'};
 let currentUser = null;
+let userType = null;
 
 function doLogin(){
   const u = document.getElementById('lu').value.trim().toLowerCase();
@@ -364,11 +373,16 @@ function doLogin(){
   const err = document.getElementById('login-error');
   if(USERS[u] && USERS[u]===p){
     currentUser = u;
+    userType = u === 'alejandro' ? 'employee' : 'admin';
     try{sessionStorage.setItem('gp_user',u);}catch(e){}
     err.className='login-error';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('user-badge').textContent=u;
+    
+    // Set body class for employee styling
+    document.body.className = userType === 'employee' ? 'employee' : 'admin';
+    
     loadAndRender();
   } else {
     err.className='login-error show';
@@ -563,57 +577,94 @@ async function updField(id,field,val){
 }
 
 // ─── TABLE BUILDER ───────────────────────────────────────────
+function getTableHeaders() {
+  if (userType === 'employee') {
+    return '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Instalador</th>';
+  } else {
+    return '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Tip $</th><th>Directo Angelo $</th><th></th>';
+  }
+}
+
 function buildTableRows(da,tbodyId,sumElId){
   const tbody=document.getElementById(tbodyId);
   let tm=0,tc=0,td=0,tt=0;
   da.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
-  if(sumElId){
+  
+  // Only show financial summary for admin users
+  if(sumElId && userType === 'admin'){
     document.getElementById(sumElId).innerHTML=
       `<div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>`+
       `<div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>`+
       `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
       `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
   }
-  if(!da.length){tbody.innerHTML='<tr><td colspan="12" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
+  
+  if(!da.length){
+    const colspan = userType === 'employee' ? 5 : 12;
+    tbody.innerHTML=`<tr><td colspan="${colspan}" class="empty-r">No hay citas. ${userType === 'admin' ? 'Toca "+ Agregar" para crear una.' : ''}</td></tr>`;
+    return;
+  }
+  
   tbody.innerHTML=da.map(a=>{
     const id=a.id;
-    const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
-    const instOpts=`<option value="">—</option>`+
-      [['angelo_solo','Angelo solo (40%)'],['pino','Pino'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
-        `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
-    const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
-    const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
     const status=a.status||'pending';
     const isDone=status==='done';
     const isCancel=status==='cancelled';
     const nameColor=isDone?'#63c462':isCancel?'#f09595':'var(--accent2)';
-    const phoneLink=a.phone?`<a href="tel:${a.phone}" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📞 ${a.phone}</a>`:'';
-    const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
-    const extraInfo=phoneLink+addrLink;
-    return `<tr>
-      <td style="min-width:80px;text-align:center">
-        <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
-          <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
-          <option value="done"${isDone?' selected':''}>✅ Hecho</option>
-          <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
-        </select>
-      </td>
-      <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
-        <div style="font-weight:600;font-size:13px">${a.name}</div>
-        ${a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:3px;text-decoration:none">📍 ${a.addr}</a>`:''}
-        ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
-      </td>
-      <td class="td-time">${a.time||'—'}</td>
-      <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
-      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onblur="updField('${id}','monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
-      <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
-      <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
-      <td class="td-com" id="com-${id}">${ct}</td>
-      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px" onblur="updField('${id}','directo',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-      <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
-    </tr>`;
+    
+    if(userType === 'employee') {
+      // Limited view for employees - only essential columns
+      return `<tr>
+        <td style="min-width:80px;text-align:center">
+          <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
+            <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
+            <option value="done"${isDone?' selected':''}>✅ Hecho</option>
+            <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
+          </select>
+        </td>
+        <td style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+          <div style="font-weight:600;font-size:13px">${a.name}</div>
+          ${a.addr?`<div style="color:var(--accent2);font-size:11px;margin-top:3px">📍 ${a.addr}</div>`:''}
+          ${a.phone?`<div style="color:var(--accent2);font-size:11px;margin-top:2px">📞 ${a.phone}</div>`:''}
+        </td>
+        <td class="td-time">${a.time||'—'}</td>
+        <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
+        <td style="min-width:130px;font-size:12px">${a.inst==='angelo_solo'?'Angelo solo':a.inst==='pino'?'Pino':a.inst==='angelo_pino'?'Angelo y Pino':'—'}</td>
+      </tr>`;
+    } else {
+      // Full admin view
+      const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
+      const instOpts=`<option value="">—</option>`+
+        [['angelo_solo','Angelo solo (40%)'],['pino','Pino'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
+          `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
+      const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
+      const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
+      
+      return `<tr>
+        <td style="min-width:80px;text-align:center">
+          <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
+            <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
+            <option value="done"${isDone?' selected':''}>✅ Hecho</option>
+            <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
+          </select>
+        </td>
+        <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+          <div style="font-weight:600;font-size:13px">${a.name}</div>
+          ${a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:3px;text-decoration:none">📍 ${a.addr}</a>`:''}
+          ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
+        </td>
+        <td class="td-time">${a.time||'—'}</td>
+        <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
+        <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onblur="updField('${id}','monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
+        <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
+        <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
+        <td class="td-com" id="com-${id}">${ct}</td>
+        <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px" onblur="updField('${id}','directo',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
+      </tr>`;
+    }
   }).join('');
 }
 
@@ -626,6 +677,10 @@ function showCalDay(ds){
   lbl=lbl.charAt(0).toUpperCase()+lbl.slice(1);
   document.getElementById('dp-title').textContent=lbl;
   document.getElementById('dp-add-btn').onclick=()=>openForm(ds);
+  
+  // Set dynamic headers
+  document.getElementById('day-table-headers').innerHTML = getTableHeaders();
+  
   buildTableRows(da,'cal-tbody','dp-sum');
   const wrap=document.getElementById('cal-table-wrap');
   wrap.style.display='block';
@@ -712,9 +767,7 @@ function renderAgenda(){
         <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
       </div>
       <div class="tscroll"><table><thead><tr>
-        <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
-        <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
-        <th>Tip $</th><th>Directo Angelo $</th><th></th>
+        ${getTableHeaders()}
       </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
     } else {
       html+=`<div class="no-appt-day">Sin citas este día</div>`;
