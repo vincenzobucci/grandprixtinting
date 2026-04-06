@@ -419,7 +419,7 @@ async function loadAndRender(){
   const {data,error} = await sb.from('appointments').select('*').order('date').order('time');
   if(error){showToast('Error cargando citas');console.error(error);return;}
   appts = data || [];
-  render();
+  await render();
   if(userType === 'admin') renderBalanceCard(); // Only show balance to admin
 }
 
@@ -545,7 +545,7 @@ async function saveAppt(){
   await loadAndRender();
   document.querySelector('.bsave').textContent='Guardar cita';
   if(curView==='mes'&&selDate)showCalDay(selDate);
-  if(curView==='agenda')renderAgenda();
+  if(curView==='agenda')await renderAgenda();
 }
 
 async function delAppt(id){
@@ -554,7 +554,7 @@ async function delAppt(id){
   showToast('Eliminada');
   await loadAndRender();
   if(curView==='mes'&&selDate)showCalDay(selDate);
-  if(curView==='agenda')renderAgenda();
+  if(curView==='agenda')await renderAgenda();
 }
 
 async function updField(id,field,val){
@@ -574,7 +574,7 @@ async function updField(id,field,val){
   await dbUpdate(id,update);
   await loadAndRender();
   if(curView==='mes'&&selDate)showCalDay(selDate);
-  if(curView==='agenda')renderAgenda();
+  if(curView==='agenda')await renderAgenda();
 }
 
 // ─── TABLE BUILDER ───────────────────────────────────────────
@@ -743,13 +743,44 @@ async function renderBalanceCard(){
     (pw.length?`<div class="balance-weeks">${pw.map(w=>`<div class="bweek-pill">${w.lbl}: $${w.neto.toFixed(2)}</div>`).join('')}</div>`:'');
 }
 
-function toggleWeekPaid(wk){
-  weekPaid[wk]=!weekPaid[wk];saveWP();renderAgenda();
+async function calcPreviousUnpaidWeeks(currentWeekStart) {
+  // Get ALL appointments to calculate unpaid weeks before current week
+  const {data,error} = await sb.from('appointments').select('*').order('date');
+  if(error){console.error('Error loading appointments for accumulated calculation:',error);return 0;}
+  const allAppts = data || [];
+  
+  // Calculate week netos from ALL appointments
+  const wn={};
+  allAppts.forEach(a=>{
+    if(!a.date)return;
+    const d=new Date(a.date+'T12:00');
+    const dow=d.getDay();
+    const sun=new Date(d);sun.setDate(d.getDate()+(dow===0?0:7-dow));
+    const wk=mkDs(sun.getFullYear(),sun.getMonth(),sun.getDate());
+    if(!wn[wk])wn[wk]={neto:0,startDs:a.date};
+    wn[wk].neto+=flt(a.com)+flt(a.tip)-flt(a.directo);
+    if(a.date<wn[wk].startDs)wn[wk].startDs=a.date;
+  });
+  
+  // Sum unpaid weeks that are before currentWeekStart
+  let accumulated = 0;
+  Object.keys(wn).forEach(wk=>{
+    const key=wn[wk].startDs;
+    if(!weekPaid[key] && wn[wk].neto>0 && key < currentWeekStart){
+      accumulated += wn[wk].neto;
+    }
+  });
+  
+  return accumulated;
+}
+
+async function toggleWeekPaid(wk){
+  weekPaid[wk]=!weekPaid[wk];saveWP();await renderAgenda();
   if(userType === 'admin') renderBalanceCard(); // Update balance for admin
   showToast(weekPaid[wk]?'Semana marcada como pagada':'Semana pendiente');
 }
 
-function renderAgenda(){
+async function renderAgenda(){
   const wrap=document.getElementById('agenda-wrap');
   const dim=new Date(curYear,curMonth+1,0).getDate();
   const todayStr=mkDs(now.getFullYear(),now.getMonth(),now.getDate());
@@ -796,6 +827,8 @@ function renderAgenda(){
 
     if(dow===0){
       const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
+      const accumulated = await calcPreviousUnpaidWeeks(wk);
+      const totalWithAccumulated = net + accumulated;
       html+=`<div class="week-total">
         <div class="wt-title">Resumen semana · ${wN} cita${wN!==1?'s':''}</div>
         <div class="wt-grid">
@@ -803,10 +836,12 @@ function renderAgenda(){
           <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
           <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
           <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
+          ${accumulated > 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">Acumulado semanas anteriores</div></div>` : ''}
         </div>
         <div class="wt-paid-row">
           <div>
-            <div class="wt-neto">Neto a pagar Angelo: $${net.toFixed(2)}</div>
+            <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
+            ${accumulated > 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Total con acumulado: $${totalWithAccumulated.toFixed(2)}</div>` : ''}
             <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
           </div>
           <button class="wt-paid-btn ${isPaid?'pagado':'pendiente'}" onclick="toggleWeekPaid('${wk}')">${isPaid?'✓ Pagado':'Marcar pagado'}</button>
@@ -818,6 +853,8 @@ function renderAgenda(){
 
   if(new Date(curYear,curMonth,dim).getDay()!==0&&(wN>0||wM>0)){
     const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
+    const accumulated = await calcPreviousUnpaidWeeks(wk);
+    const totalWithAccumulated = net + accumulated;
     html+=`<div class="week-total">
       <div class="wt-title">Resumen semana parcial · ${wN} cita${wN!==1?'s':''}</div>
       <div class="wt-grid">
@@ -825,10 +862,12 @@ function renderAgenda(){
         <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
         <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
         <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
+        ${accumulated > 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">Acumulado semanas anteriores</div></div>` : ''}
       </div>
       <div class="wt-paid-row">
         <div>
-          <div class="wt-neto">Neto a pagar Angelo: $${net.toFixed(2)}</div>
+          <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
+          ${accumulated > 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Total con acumulado: $${totalWithAccumulated.toFixed(2)}</div>` : ''}
           <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
         </div>
         <button class="wt-paid-btn ${isPaid?'pagado':'pendiente'}" onclick="toggleWeekPaid('${wk}')">${isPaid?'✓ Pagado':'Marcar pagado'}</button>
@@ -862,13 +901,13 @@ function updateStats(){
   document.getElementById('s-neto').textContent='$'+(tc+tt-td).toFixed(0);
 }
 
-function setView(v){
+async function setView(v){
   curView=v;
   document.getElementById('view-mes').style.display=v==='mes'?'block':'none';
   document.getElementById('view-agenda').style.display=v==='agenda'?'block':'none';
   document.getElementById('tab-mes').className='vtab'+(v==='mes'?' active':'');
   document.getElementById('tab-agenda').className='vtab'+(v==='agenda'?' active':'');
-  if(v==='agenda')renderAgenda();
+  if(v==='agenda')await renderAgenda();
 }
 
 function changeMonth(dir){
@@ -880,7 +919,7 @@ function changeMonth(dir){
   render();
 }
 
-function render(){
+async function render(){
   const mnames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('month-lbl').textContent=mnames[curMonth]+' '+curYear;
   document.getElementById('bnav-month-lbl').textContent=mnames[curMonth]+' '+curYear;
@@ -908,7 +947,7 @@ function render(){
   }
   document.getElementById('days-grid').innerHTML=html;
   updateStats();
-  if(curView==='agenda')renderAgenda();
+  if(curView==='agenda')await renderAgenda();
 }
 
 // ─── REALTIME ────────────────────────────────────────────────
