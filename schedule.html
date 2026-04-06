@@ -354,6 +354,429 @@ td:last-child{border-right:none}
 <div class="toast" id="toast-el"></div>
 
 <script>
+// ─── CONFIG ──────────────────────────────────────────────────
+const SUPABASE_URL = 'https://mcwcecpoiyrsmalcrdyz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jd2NlY3BvaXlyc21hbGNyZHl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NzE2MjAsImV4cCI6MjAyNzI0NzYyMH0.q06OJ_HnHd2recto2Z8select-1';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── AUTH ────────────────────────────────────────────────────
+const USERS = {
+  'grandprixaccesoriesllc@gmail.com': '4698650',
+  'alejandro': 'grandprix1234'
+};
+
+let currentUser = null;
+let userType = null;
+let appts = [];
+
+function doLogin() {
+  try {
+    const u = document.getElementById('lu').value.trim().toLowerCase();
+    const p = document.getElementById('lp').value.trim();
+    const err = document.getElementById('login-error');
+    
+    if (USERS[u] && USERS[u] === p) {
+      currentUser = u;
+      userType = (u === 'alejandro') ? 'employee' : 'admin';
+      
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('user-badge').textContent = u;
+      
+      loadData();
+    } else {
+      err.className = 'login-error show';
+      document.getElementById('lp').value = '';
+    }
+  } catch (e) {
+    console.error('Login error:', e);
+    alert('Error en login: ' + e.message);
+  }
+}
+
+async function loadData() {
+  try {
+    const {data, error} = await sb.from('appointments').select('*').order('date');
+    if (error) {
+      console.error('Error loading data:', error);
+      return;
+    }
+    appts = data || [];
+    render();
+  } catch (e) {
+    console.error('Data loading error:', e);
+  }
+}
+
+function render() {
+  // Simple render - just show we're logged in
+  document.getElementById('app').innerHTML = `
+    <div style="padding: 20px; color: white;">
+      <h2>Logged in as: ${currentUser}</h2>
+      <h3>User type: ${userType}</h3>
+      <h3>Appointments loaded: ${appts.length}</h3>
+      <button onclick="location.reload()">Restart</button>
+    </div>
+  `;
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  // Bind Enter key to login
+  const passInput = document.getElementById('lp');
+  if (passInput) {
+    passInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+  }
+});
+</script></script>
+
+  <style>
+    :root{--bg:#080a0f;--card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--muted:#7a8299;--text:#eef0f8;--accent:#c8ff00;--accent2:#00d4ff;--r:16px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    
+    .employee-hidden { display: none !important; }
+    body.employee .add-btn, 
+    body.employee #balance-card,
+    body.employee .bottom-nav { display: none !important; }
+    
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    .blob1,.blob2{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:0.15}
+    .blob1{width:600px;height:400px;background:var(--accent2);top:-150px;left:-150px}
+    .blob2{width:500px;height:350px;background:var(--accent);bottom:-100px;right:-100px}
+
+    /* LOGIN */
+    #login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px}
+    .login-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--cb);border-radius:24px;padding:36px 32px;position:relative;z-index:1;animation:fadeUp 0.5s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+    .login-logo{text-align:center;margin-bottom:24px}
+    .login-logo img{height:52px;border-radius:8px}
+    .login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;text-align:center;margin-bottom:4px}
+    .login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px}
+    .fg-login{margin-bottom:12px}
+    .fg-login label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px}
+    .fg-login input{width:100%;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:12px 14px;border-radius:10px;font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+    .fg-login input:focus{border-color:rgba(0,212,255,0.5)}
+    .login-btn{width:100%;margin-top:16px;background:var(--accent);color:#080a0f;border:none;padding:13px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .login-btn:hover{opacity:0.88}
+    .login-error{display:none;margin-top:12px;background:rgba(226,75,74,0.12);border:1px solid rgba(226,75,74,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#f09595;text-align:center}
+    .login-error.show{display:block}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:rgba(8,10,15,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--cb)}
+    .nav-brand{display:flex;align-items:center;gap:10px}
+    .nav-brand img{height:34px;border-radius:6px}
+    .nav-brand span{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:#63c462;animation:pulse 2s infinite;display:inline-block;margin-left:6px}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .user-badge{font-size:12px;color:var(--muted);background:rgba(255,255,255,0.05);border:1px solid var(--cb);border-radius:999px;padding:5px 14px}
+    .logout-btn{font-size:12px;color:var(--muted);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;padding:5px 10px}
+    .logout-btn:hover{color:#f09595}
+
+    /* APP */
+    #app{display:none;position:relative;z-index:1}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 80px}
+
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:24px}
+    .scard{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:14px 16px}
+    .scard .sn{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);line-height:1}
+    .scard .sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+
+    /* CAL TOP */
+    .cal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+    .cal-nav-btns{display:flex;gap:8px;align-items:center}
+    .cnb{background:var(--card);border:1px solid var(--cb);color:var(--text);border-radius:8px;padding:6px 13px;font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;line-height:1}
+    .cnb:hover{background:rgba(255,255,255,0.08)}
+    .month-label{font-size:15px;font-weight:600;min-width:140px;text-align:center}
+    .view-toggle{display:flex;border:1px solid var(--cb);border-radius:8px;overflow:hidden}
+    .vtab{padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);border:none;font-family:'DM Sans',sans-serif}
+    .vtab.active{background:var(--accent);color:#080a0f}
+    .add-btn{background:var(--accent);color:#080a0f;border:none;border-radius:10px;padding:9px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+    /* CALENDAR */
+    .cal-box{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+    .day-headers{display:grid;grid-template-columns:repeat(7,1fr);background:rgba(255,255,255,0.03);border-bottom:1px solid var(--cb)}
+    .dhdr{padding:8px 0;text-align:center;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+    .days-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+    .dcell{min-height:66px;padding:5px 4px;border-right:0.5px solid var(--cb);border-bottom:0.5px solid var(--cb);cursor:pointer;background:transparent;transition:background 0.1s}
+    .dcell:hover{background:rgba(255,255,255,0.04)}
+    .dcell.other{opacity:0.3}
+    .dcell.today .dnum{background:var(--accent);color:#080a0f;border-radius:50%}
+    .dcell.selected{background:rgba(200,255,0,0.05)}
+    .dcell:nth-child(7n){border-right:none}
+    .dnum{font-size:11px;font-weight:500;width:21px;height:21px;display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+    .dot-row{display:flex;gap:2px;justify-content:center;flex-wrap:wrap}
+    .adot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+    .cbadge{font-size:9px;color:var(--accent);font-weight:700;text-align:center;margin-top:1px}
+
+    /* DAY PANEL */
+    .day-panel{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+    .dp-hdr{background:rgba(200,255,0,0.08);border-bottom:1px solid rgba(200,255,0,0.15);padding:11px 16px;display:flex;align-items:center;justify-content:space-between}
+    .dp-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:0.5px;color:var(--accent)}
+    .dp-add{background:var(--accent);color:#080a0f;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .dp-sum{background:rgba(0,0,0,0.2);padding:8px 16px;display:flex;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--cb)}
+    .sum-i{font-size:11px;color:var(--accent2)}.sum-i span{font-weight:700}
+    .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;min-width:800px}
+    thead tr{background:rgba(255,255,255,0.03);border-bottom:1px solid var(--cb)}
+    th{padding:9px 11px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;border-right:0.5px solid var(--cb);text-transform:uppercase;letter-spacing:0.3px}
+    th:last-child{border-right:none}
+    tbody tr{border-bottom:0.5px solid var(--cb);transition:background 0.1s}
+    tbody tr:hover{background:rgba(255,255,255,0.03)}
+    tbody tr:last-child{border-bottom:none}
+    td{padding:8px 11px;font-size:12px;vertical-align:middle;border-right:0.5px solid var(--cb)}
+    td:last-child{border-right:none}
+    .td-name{font-weight:600;min-width:110px;cursor:pointer;color:var(--accent2)}
+    .td-time{color:var(--muted);white-space:nowrap;min-width:50px}
+    .tsel{padding:5px 6px;border:1px solid var(--cb);border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;background:rgba(0,0,0,0.3);color:var(--text);cursor:pointer;width:100%}
+    .tinp{padding:5px 7px;border:1px solid var(--cb);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;background:rgba(0,0,0,0.3);color:var(--text);width:100%}
+    .tinp:focus,.tsel:focus{outline:none;border-color:rgba(0,212,255,0.5)}
+    .td-com{font-weight:700;color:var(--accent);white-space:nowrap;min-width:90px;font-size:12px}
+    .delbtn{background:none;border:none;color:rgba(255,255,255,0.2);font-size:15px;cursor:pointer;padding:2px 6px;border-radius:4px}
+    .delbtn:hover{color:#f09595}
+    .empty-r{padding:22px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* AGENDA */
+    .agenda-wrap{display:flex;flex-direction:column;gap:10px}
+    .agenda-day{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden}
+    .agenda-day-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:0.5px solid var(--cb);cursor:pointer}
+    .agenda-day-hdr:hover{background:rgba(255,255,255,0.03)}
+    .agenda-day-label{font-size:13px;font-weight:700}
+    .agenda-day-label.is-today{color:var(--accent)}
+    .agenda-day-sub{font-size:11px;color:var(--muted);margin-top:1px}
+    .agenda-add-btn{background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);color:var(--accent);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .no-appt-day{padding:12px 16px;font-size:12px;color:rgba(255,255,255,0.2);font-style:italic}
+
+    /* WEEK TOTAL */
+    .week-total{background:linear-gradient(135deg,rgba(200,255,0,0.07),rgba(0,212,255,0.05));border:1px solid rgba(200,255,0,0.15);border-radius:var(--r);padding:14px 18px}
+    .wt-title{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+    .wt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+    .wt-item{background:rgba(0,0,0,0.2);border-radius:8px;padding:9px 11px}
+    .wt-item .wn{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);letter-spacing:0.5px}
+    .wt-item .wl{font-size:10px;color:var(--muted);margin-top:1px}
+    .wt-paid-row{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;gap:10px}
+    .wt-neto{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:0.5px}
+    .wt-neto-lbl{font-size:11px;color:var(--muted);margin-top:1px}
+    .wt-paid-btn{padding:7px 18px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+    .wt-paid-btn.pendiente{background:rgba(255,255,255,0.08);color:var(--text);border:1px solid rgba(255,255,255,0.12)}
+    .wt-paid-btn.pagado{background:#63c462;color:#fff}
+
+    /* BALANCE */
+    .balance-card{border-radius:var(--r);padding:14px 18px;margin-bottom:4px;border:2px solid rgba(226,75,74,0.4);background:rgba(226,75,74,0.06)}
+    .balance-card.zero{border-color:rgba(99,196,98,0.4);background:rgba(99,196,98,0.06)}
+    .balance-amount{font-family:'Bebas Neue',sans-serif;font-size:34px;color:#f09595;letter-spacing:1px}
+    .balance-card.zero .balance-amount{color:#63c462}
+    .balance-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#f09595;margin-bottom:6px}
+    .balance-card.zero .balance-label{color:#63c462}
+    .balance-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .balance-weeks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .bweek-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(226,75,74,0.15);color:#f09595;font-weight:500}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+    .modal-overlay.open{display:flex}
+    .modal{background:#10121a;border:1px solid var(--cb);border-radius:24px 24px 0 0;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:20px 20px 40px}
+    .mhandle{width:40px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 16px}
+    .mtitle{font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:14px;color:var(--accent);letter-spacing:1px}
+    .fg{margin-bottom:11px}
+    .fg label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+    .fg input,.fg select{width:100%;padding:11px 13px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;background:rgba(0,0,0,0.4);color:var(--text);outline:none;transition:border-color 0.2s;appearance:none;-webkit-appearance:none}
+    .fg input:focus,.fg select:focus{border-color:rgba(0,212,255,0.5)}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .cprev{background:rgba(200,255,0,0.08);border:1px solid rgba(200,255,0,0.15);border-radius:10px;padding:11px 13px;margin-bottom:11px;font-size:13px;color:var(--accent);font-weight:600;text-align:center}
+    .bsave{width:100%;padding:13px;background:var(--accent);color:#080a0f;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
+    .bcancel{display:block;text-align:center;margin-top:10px;color:var(--muted);font-size:13px;cursor:pointer;padding:6px}
+
+    /* LOADING */
+    .loading-spinner{display:none;text-align:center;padding:20px;color:var(--muted);font-size:13px}
+    .loading-spinner.show{display:block}
+
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--accent);color:#080a0f;padding:10px 24px;border-radius:999px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+    .bottom-nav{position:fixed;bottom:20px;right:20px;z-index:150;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .bottom-nav-inner{display:flex;gap:8px;align-items:center;background:rgba(8,10,15,0.92);border:1px solid var(--cb);border-radius:999px;padding:8px 14px;backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(0,0,0,0.4)}
+    .bnav-btn{background:rgba(255,255,255,0.07);border:1px solid var(--cb);color:var(--text);border-radius:999px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all 0.15s;white-space:nowrap}
+    .bnav-btn:hover{background:rgba(255,255,255,0.12)}
+    .bnav-month{font-size:13px;font-weight:600;color:var(--accent);min-width:110px;text-align:center}
+    .bnav-add{background:var(--accent);color:#080a0f;border:none;border-radius:999px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s}
+    .bnav-add:hover{opacity:0.85}
+    .bnav-top{background:rgba(255,255,255,0.05);border:1px solid var(--cb);color:var(--muted);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+    .bnav-top:hover{color:var(--text);background:rgba(255,255,255,0.1)}
+    .toast.show{opacity:1}
+  </style>
+
+</head>
+<body>
+<div class="blob1"></div><div class="blob2"></div>
+
+<!-- LOGIN -->
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><img src="LOGOBIEN.JPEG" alt="Grand Prix"/></div>
+    <div class="login-title">Staff Access</div>
+    <div class="login-sub">Grand Prix Accessories · Schedule</div>
+    <div class="fg-login"><label>Email</label><input type="email" id="lu" placeholder="user@email.com" autocomplete="username"/></div>
+    <div class="fg-login"><label>Password</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-error" id="login-error">Incorrect email or password.</div>
+  </div>
+</div>
+
+<!-- APP -->
+
+<div id="app">
+  <nav>
+    <div class="nav-brand">
+      <img src="LOGOBIEN.JPEG" alt="Grand Prix"/>
+      <span>Grand Prix · Schedule</span>
+      <span class="live-dot" title="Live — Supabase connected"></span>
+    </div>
+    <div class="nav-right">
+      <span class="user-badge" id="user-badge"></span>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="scard"><div class="sn" id="s-citas">0</div><div class="sl">Citas mes</div></div>
+      <div class="scard"><div class="sn" id="s-ing">$0</div><div class="sl">Ingresos</div></div>
+      <div class="scard"><div class="sn" id="s-com">$0</div><div class="sl">Comisión Angelo</div></div>
+      <div class="scard"><div class="sn" id="s-neto">$0</div><div class="sl">Neto Angelo</div></div>
+    </div>
+
+```
+<div class="cal-top">
+  <div class="cal-nav-btns">
+    <button class="cnb" onclick="changeMonth(-1)">&#8592;</button>
+    <span class="month-label" id="month-lbl"></span>
+    <button class="cnb" onclick="changeMonth(1)">&#8594;</button>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <div class="view-toggle">
+      <button class="vtab active" id="tab-mes" onclick="setView('mes')">Mes</button>
+      <button class="vtab" id="tab-agenda" onclick="setView('agenda')">Agenda</button>
+    </div>
+    <button class="add-btn" onclick="openForm(null)">+ Nueva cita</button>
+  </div>
+</div>
+
+<!-- MONTH VIEW -->
+<div id="view-mes">
+  <div class="cal-box">
+    <div class="day-headers">
+      <div class="dhdr">Dom</div><div class="dhdr">Lun</div><div class="dhdr">Mar</div>
+      <div class="dhdr">Mié</div><div class="dhdr">Jue</div><div class="dhdr">Vie</div><div class="dhdr">Sáb</div>
+    </div>
+    <div class="days-grid" id="days-grid"></div>
+  </div>
+  <div id="cal-table-wrap" style="display:none">
+    <div class="day-panel">
+      <div class="dp-hdr">
+        <span class="dp-title" id="dp-title"></span>
+        ${userType === 'admin' ? '<button class="agenda-add-btn" onclick="event.stopPropagation();openForm(\'' + ds + '\')">+ Agregar</button>' : ''}</button>
+      </div>
+      <div class="dp-sum" id="dp-sum"></div>
+      <div class="tscroll">
+        <table><thead><tr>
+          <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+          <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
+          <th>Tip $</th><th>Directo Angelo $</th><th></th>
+        </tr></thead><tbody id="cal-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AGENDA VIEW -->
+<div id="view-agenda" style="display:none">
+  <div class="agenda-wrap" id="agenda-wrap"></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<div class="modal-overlay" id="modal-overlay" onclick="handleOv(event)">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="mtitle">Nueva cita</div>
+    <div class="frow">
+      <div class="fg"><label>Fecha</label><input type="date" id="f-date"/></div>
+      <div class="fg"><label>Hora</label><input type="time" id="f-time"/></div>
+    </div>
+    <div class="fg"><label>Nombre del cliente</label><input id="f-name" placeholder="Nombre completo"/></div>
+    <div class="fg"><label>Teléfono</label><input id="f-phone" type="tel" placeholder="(305) 555-1234" inputmode="tel"/></div>
+    <div class="frow">
+      <div class="fg"><label>Vehículo</label><input id="f-car" placeholder="Toyota Camry 2022"/></div>
+      <div class="fg"><label>Servicio</label>
+        <select id="f-service" onchange="updPrev();toggleCustomService()">
+          <option value="">Seleccionar...</option>
+          <option>Tint completo</option>
+          <option>Parabrisas</option>
+          <option>Match</option>
+          <option>Lados</option>
+          <option>Atras</option>
+          <option>Ventanas laterales</option>
+          <option>Ventana trasera</option>
+          <option>Remoción de tint</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" id="fg-custom-service" style="display:none">
+      <label>Describe el servicio</label>
+      <input id="f-service-custom" placeholder="Escribe el servicio aquí..."/>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Monto ($)</label><input type="number" id="f-monto" placeholder="0.00" inputmode="decimal" oninput="updPrev()"/></div>
+      <div class="fg"><label>Instalador</label>
+        <select id="f-inst" onchange="updPrev()">
+          <option value="">Seleccionar...</option>
+          <option value="angelo_solo">Angelo solo — 40%</option>
+          <option value="pino">Pino</option>
+          <option value="angelo_pino">Angelo y Pino — 25%</option>
+        </select>
+      </div>
+    </div>
+    <div class="cprev" id="cprev">Selecciona instalador y monto</div>
+    <div class="frow">
+      <div class="fg"><label>¿Pagó?</label>
+        <select id="f-pago"><option value="">—</option><option value="si">Sí</option><option value="no">No</option></select>
+      </div>
+      <div class="fg"><label>Forma de pago</label>
+        <select id="f-forma"><option value="">—</option><option>Cash</option><option>Zelle</option><option>Tarjeta</option><option>Cheque</option><option>Quickbooks</option><option>Otro</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Tip ($)</label><input type="number" id="f-tip" placeholder="0.00" inputmode="decimal"/></div>
+      <div class="fg"><label>Pagó directo a Angelo ($)</label><input type="number" id="f-directo" placeholder="0.00" inputmode="decimal"/></div>
+    </div>
+    <div class="fg"><label>Dirección</label><input id="f-addr" placeholder="123 SW 8th St, Miami FL 33130"/></div>
+    <button class="bsave" onclick="saveAppt()">Guardar cita</button>
+    <span class="bcancel" onclick="closeForm()">Cancelar</span>
+  </div>
+</div>
+
+<div class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn" onclick="changeMonth(-1)">&#8592;</button>
+    <span class="bnav-month" id="bnav-month-lbl"></span>
+    <button class="bnav-btn" onclick="changeMonth(1)">&#8594;</button>
+    <button class="bnav-add" onclick="openForm(null)">+ Cita</button>
+  </div>
+  <button class="bnav-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593; Arriba</button>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<script>
 // ─── SUPABASE ────────────────────────────────────────────────
 const SUPABASE_URL = 'https://mcwcecpoiyrsmalcrdyz.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JoNXZmoSh0DAMvuQ-aMP4Q_ibxuhsQ_';
@@ -422,6 +845,7 @@ function setTableHeaders() {
     if (userType === 'employee') {
       mainHeader.innerHTML = '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Instalador</th>';
     } else {
+      // Default to admin view for null/undefined userType
       mainHeader.innerHTML = '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Tip $</th><th>Directo Angelo $</th><th></th>';
     }
   }
@@ -915,5 +1339,6 @@ sb.channel('appointments-changes')
   })
   .subscribe();
 </script>
+
 </body>
 </html>
