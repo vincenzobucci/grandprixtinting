@@ -1,3 +1,4 @@
+
 <!doctype html>
 
 <html lang="en">
@@ -110,6 +111,42 @@ td:last-child{border-right:none}
 .delbtn:hover{color:#f09595}
 .empty-r{padding:22px;text-align:center;color:var(--muted);font-size:13px}
 
+/* AGENDA */
+.agenda-wrap{display:flex;flex-direction:column;gap:10px}
+.agenda-day{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden}
+.agenda-day-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:0.5px solid var(--cb);cursor:pointer}
+.agenda-day-hdr:hover{background:rgba(255,255,255,0.03)}
+.agenda-day-label{font-size:13px;font-weight:700}
+.agenda-day-label.is-today{color:var(--accent)}
+.agenda-day-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.agenda-add-btn{background:rgba(200,255,0,0.1);border:1px solid rgba(200,255,0,0.2);color:var(--accent);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.no-appt-day{padding:12px 16px;font-size:12px;color:rgba(255,255,255,0.2);font-style:italic}
+
+/* WEEK TOTAL */
+.week-total{background:linear-gradient(135deg,rgba(200,255,0,0.07),rgba(0,212,255,0.05));border:1px solid rgba(200,255,0,0.15);border-radius:var(--r);padding:14px 18px}
+.wt-title{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.wt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.wt-item{background:rgba(0,0,0,0.2);border-radius:8px;padding:9px 11px}
+.wt-item .wn{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text);letter-spacing:0.5px}
+.wt-item .wl{font-size:10px;color:var(--muted);margin-top:1px}
+.wt-paid-row{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;gap:10px}
+.wt-neto{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:0.5px}
+.wt-neto-lbl{font-size:11px;color:var(--muted);margin-top:1px}
+.wt-paid-btn{padding:7px 18px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.wt-paid-btn.pendiente{background:rgba(255,255,255,0.08);color:var(--text);border:1px solid rgba(255,255,255,0.12)}
+.wt-paid-btn.pagado{background:#63c462;color:#fff}
+
+/* BALANCE */
+.balance-card{border-radius:var(--r);padding:14px 18px;margin-bottom:4px;border:2px solid rgba(226,75,74,0.4);background:rgba(226,75,74,0.06)}
+.balance-card.zero{border-color:rgba(99,196,98,0.4);background:rgba(99,196,98,0.06)}
+.balance-amount{font-family:'Bebas Neue',sans-serif;font-size:34px;color:#f09595;letter-spacing:1px}
+.balance-card.zero .balance-amount{color:#63c462}
+.balance-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:#f09595;margin-bottom:6px}
+.balance-card.zero .balance-label{color:#63c462}
+.balance-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.balance-weeks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.bweek-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(226,75,74,0.15);color:#f09595;font-weight:500}
+
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
 .modal-overlay.open{display:flex}
@@ -130,6 +167,15 @@ td:last-child{border-right:none}
 .loading-spinner.show{display:block}
 
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--accent);color:#080a0f;padding:10px 24px;border-radius:999px;font-size:13px;font-weight:700;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.bottom-nav{position:fixed;bottom:20px;right:20px;z-index:150;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.bottom-nav-inner{display:flex;gap:8px;align-items:center;background:rgba(8,10,15,0.92);border:1px solid var(--cb);border-radius:999px;padding:8px 14px;backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(0,0,0,0.4)}
+.bnav-btn{background:rgba(255,255,255,0.07);border:1px solid var(--cb);color:var(--text);border-radius:999px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all 0.15s;white-space:nowrap}
+.bnav-btn:hover{background:rgba(255,255,255,0.12)}
+.bnav-month{font-size:13px;font-weight:600;color:var(--accent);min-width:110px;text-align:center}
+.bnav-add{background:var(--accent);color:#080a0f;border:none;border-radius:999px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s}
+.bnav-add:hover{opacity:0.85}
+.bnav-top{background:rgba(255,255,255,0.05);border:1px solid var(--cb);color:var(--muted);border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.bnav-top:hover{color:var(--text);background:rgba(255,255,255,0.1)}
 .toast.show{opacity:1}
 ```
 
@@ -178,39 +224,49 @@ td:last-child{border-right:none}
 ```
 <div class="cal-top">
   <div class="cal-nav-btns">
-    <button class="cnb" onclick="changeMonth(-1)">←</button>
+    <button class="cnb" onclick="changeMonth(-1)">&#8592;</button>
     <span class="month-label" id="month-lbl"></span>
-    <button class="cnb" onclick="changeMonth(1)">→</button>
+    <button class="cnb" onclick="changeMonth(1)">&#8594;</button>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <div class="view-toggle">
+      <button class="vtab active" id="tab-mes" onclick="setView('mes')">Mes</button>
+      <button class="vtab" id="tab-agenda" onclick="setView('agenda')">Agenda</button>
+    </div>
     <button class="add-btn" onclick="openForm(null)">+ Nueva cita</button>
   </div>
 </div>
 
-<!-- CALENDAR -->
-<div class="cal-box">
-  <div class="day-headers">
-    <div class="dhdr">Dom</div><div class="dhdr">Lun</div><div class="dhdr">Mar</div>
-    <div class="dhdr">Mié</div><div class="dhdr">Jue</div><div class="dhdr">Vie</div><div class="dhdr">Sáb</div>
+<!-- MONTH VIEW -->
+<div id="view-mes">
+  <div class="cal-box">
+    <div class="day-headers">
+      <div class="dhdr">Dom</div><div class="dhdr">Lun</div><div class="dhdr">Mar</div>
+      <div class="dhdr">Mié</div><div class="dhdr">Jue</div><div class="dhdr">Vie</div><div class="dhdr">Sáb</div>
+    </div>
+    <div class="days-grid" id="days-grid"></div>
   </div>
-  <div class="days-grid" id="days-grid"></div>
+  <div id="cal-table-wrap" style="display:none">
+    <div class="day-panel">
+      <div class="dp-hdr">
+        <span class="dp-title" id="dp-title"></span>
+        <button class="dp-add" id="dp-add-btn">+ Agregar</button>
+      </div>
+      <div class="dp-sum" id="dp-sum"></div>
+      <div class="tscroll">
+        <table><thead><tr>
+          <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+          <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
+          <th>Tip $</th><th>Directo Angelo $</th><th></th>
+        </tr></thead><tbody id="cal-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div id="cal-table-wrap" style="display:none">
-  <div class="day-panel">
-    <div class="dp-hdr">
-      <span class="dp-title" id="dp-title"></span>
-      <button class="dp-add" id="dp-add-btn">+ Agregar</button>
-    </div>
-    <div class="dp-sum" id="dp-sum"></div>
-    <div class="tscroll">
-      <table><thead><tr>
-        <th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
-        <th>Instalador</th><th>Monto</th><th>Comisión Angelo</th>
-        <th>¿Pagó?</th><th>Forma pago</th><th>Tip $</th><th>Directo Angelo $</th><th></th>
-      </tr></thead><tbody id="cal-tbody"></tbody></table>
-    </div>
-  </div>
+<!-- AGENDA VIEW -->
+<div id="view-agenda" style="display:none">
+  <div class="agenda-wrap" id="agenda-wrap"></div>
 </div>
 ```
 
@@ -228,16 +284,27 @@ td:last-child{border-right:none}
       <div class="fg"><label>Hora</label><input type="time" id="f-time"/></div>
     </div>
     <div class="fg"><label>Nombre del cliente</label><input id="f-name" placeholder="Nombre completo"/></div>
+    <div class="fg"><label>Teléfono</label><input id="f-phone" type="tel" placeholder="(305) 555-1234" inputmode="tel"/></div>
     <div class="frow">
       <div class="fg"><label>Vehículo</label><input id="f-car" placeholder="Toyota Camry 2022"/></div>
       <div class="fg"><label>Servicio</label>
-        <select id="f-service">
+        <select id="f-service" onchange="updPrev();toggleCustomService()">
           <option value="">Seleccionar...</option>
-          <option>Tint completo</option><option>Parabrisas</option>
-          <option>Ventanas laterales</option><option>Ventana trasera</option>
-          <option>Remoción de tint</option><option>Otro</option>
+          <option>Tint completo</option>
+          <option>Parabrisas</option>
+          <option>Match</option>
+          <option>Lados</option>
+          <option>Atras</option>
+          <option>Ventanas laterales</option>
+          <option>Ventana trasera</option>
+          <option>Remoción de tint</option>
+          <option value="Otro">Otro</option>
         </select>
       </div>
+    </div>
+    <div class="fg" id="fg-custom-service" style="display:none">
+      <label>Describe el servicio</label>
+      <input id="f-service-custom" placeholder="Escribe el servicio aquí..."/>
     </div>
     <div class="frow">
       <div class="fg"><label>Monto ($)</label><input type="number" id="f-monto" placeholder="0.00" inputmode="decimal" oninput="updPrev()"/></div>
@@ -245,7 +312,7 @@ td:last-child{border-right:none}
         <select id="f-inst" onchange="updPrev()">
           <option value="">Seleccionar...</option>
           <option value="angelo_solo">Angelo solo — 40%</option>
-          <option value="pino">Pino — 0%</option>
+          <option value="pino">Pino</option>
           <option value="angelo_pino">Angelo y Pino — 25%</option>
         </select>
       </div>
@@ -263,20 +330,31 @@ td:last-child{border-right:none}
       <div class="fg"><label>Tip ($)</label><input type="number" id="f-tip" placeholder="0.00" inputmode="decimal"/></div>
       <div class="fg"><label>Pagó directo a Angelo ($)</label><input type="number" id="f-directo" placeholder="0.00" inputmode="decimal"/></div>
     </div>
+    <div class="fg"><label>Dirección</label><input id="f-addr" placeholder="123 SW 8th St, Miami FL 33130"/></div>
     <button class="bsave" onclick="saveAppt()">Guardar cita</button>
     <span class="bcancel" onclick="closeForm()">Cancelar</span>
   </div>
 </div>
 
+<div class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn" onclick="changeMonth(-1)">&#8592;</button>
+    <span class="bnav-month" id="bnav-month-lbl"></span>
+    <button class="bnav-btn" onclick="changeMonth(1)">&#8594;</button>
+    <button class="bnav-add" onclick="openForm(null)">+ Cita</button>
+  </div>
+  <button class="bnav-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593; Arriba</button>
+</div>
+
 <div class="toast" id="toast-el"></div>
 
 <script>
-// ─── SUPABASE ────────────────────────────────────────────────────────────────
+// ─── SUPABASE ────────────────────────────────────────────────
 const SUPABASE_URL = 'https://mcwcecpoiyrsmalcrdyz.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jd2NlY3BvaXlyc21hbGNyZHl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE2NzE2MjAsImV4cCI6MjAyNzI0NzYyMH0.q06OJ_HnHd2recto2Z8select-1';
+const SUPABASE_KEY = 'sb_publishable_JoNXZmoSh0DAMvuQ-aMP4Q_ibxuhsQ_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ─── AUTH ────────────────────────────────────────────────────────────────────
+// ─── AUTH ────────────────────────────────────────────────────
 const USERS = {'grandprixaccesoriesllc@gmail.com':'4698650'};
 let currentUser = null;
 
@@ -308,18 +386,21 @@ function doLogout(){
 })();
 document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
+// ─── STATE ───────────────────────────────────────────────────
 let appts = [];
+let weekPaid = {};
+try{weekPaid=JSON.parse(localStorage.getItem('gp_wpaid')||'{}');}catch(e){}
 const now = new Date();
 let curYear=now.getFullYear(), curMonth=now.getMonth();
-let selDate=null, editId=null;
+let selDate=null, editId=null, curView='mes';
 
+function saveWP(){try{localStorage.setItem('gp_wpaid',JSON.stringify(weekPaid));}catch(e){}}
 function pad(n){return String(n).padStart(2,'0');}
 function mkDs(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
 function flt(v){return parseFloat(v)||0;}
 function showToast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.className='toast show';setTimeout(()=>t.className='toast',2200);}
 
-// ─── SUPABASE CRUD ───────────────────────────────────────────────────────────
+// ─── SUPABASE CRUD ───────────────────────────────────────────
 async function loadAndRender(){
   const {data,error} = await sb.from('appointments').select('*').order('date').order('time');
   if(error){showToast('Error cargando citas');console.error(error);return;}
@@ -334,18 +415,19 @@ async function dbInsert(obj){
 }
 
 async function dbUpdate(id, obj){
-  const {error} = await sb.from('appointments').update(obj).eq('id',id);
+  const {error} = await sb.from('appointments').update(obj).eq('id',String(id));
   if(error){showToast('Error actualizando');console.error(error);}
 }
 
 async function dbDelete(id){
-  const {error} = await sb.from('appointments').delete().eq('id',id);
+  const {error} = await sb.from('appointments').delete().eq('id',String(id));
   if(error){showToast('Error eliminando');console.error(error);}
 }
 
-// ─── FORM ────────────────────────────────────────────────────────────────────
+// ─── FORM ────────────────────────────────────────────────────
 function calcCom(m,i){
   if(i==='angelo_solo')return flt(m)*0.40;
+  if(i==='pino')return 0;
   if(i==='angelo_pino')return flt(m)*0.25;
   return 0;
 }
@@ -353,8 +435,19 @@ function updPrev(){
   const m=document.getElementById('f-monto').value;
   const i=document.getElementById('f-inst').value;
   const el=document.getElementById('cprev');
-  if(!m||!i||i==='pino'){el.textContent='Sin comisión para Angelo';return;}
-  el.textContent='Comisión Angelo ('+(i==='angelo_solo'?40:25)+'%): $'+calcCom(m,i).toFixed(2);
+  if(!m||!i){el.textContent='Selecciona instalador y monto';return;}
+  const com=calcCom(m,i);
+  if(com===0){el.textContent='Sin comisión para este instalador';return;}
+  const pct=(i==='angelo_solo')?40:25;
+  const who=(i==='angelo_pino')?'Angelo y Pino':'Angelo';
+  el.textContent='Comisión '+who+' ('+pct+'%): $'+com.toFixed(2);
+}
+
+function toggleCustomService(){
+  const sel=document.getElementById('f-service');
+  const fg=document.getElementById('fg-custom-service');
+  fg.style.display=sel.value==='Otro'?'block':'none';
+  if(sel.value!=='Otro') document.getElementById('f-service-custom').value='';
 }
 function openForm(dv){
   editId=null;
@@ -363,16 +456,21 @@ function openForm(dv){
   document.getElementById('f-time').value='09:00';
   ['f-name','f-car','f-monto','f-tip','f-directo'].forEach(id=>document.getElementById(id).value='');
   ['f-service','f-inst','f-pago','f-forma'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-phone').value='';
+  document.getElementById('f-addr').value='';
+  document.getElementById('f-service-custom').value='';
+  document.getElementById('fg-custom-service').style.display='none';
   document.getElementById('cprev').textContent='Selecciona instalador y monto';
   document.getElementById('modal-overlay').className='modal-overlay open';
 }
 function openEdit(id){
-  const a=appts.find(x=>x.id===id);if(!a)return;
+  const a=appts.find(x=>String(x.id)===String(id));if(!a)return;
   editId=id;
   document.getElementById('mtitle').textContent='Editar cita';
   document.getElementById('f-date').value=a.date||'';
   document.getElementById('f-time').value=a.time||'';
   document.getElementById('f-name').value=a.name||'';
+  document.getElementById('f-phone').value=a.phone||'';
   document.getElementById('f-car').value=a.car||'';
   document.getElementById('f-service').value=a.service||'';
   document.getElementById('f-monto').value=a.monto||'';
@@ -381,6 +479,17 @@ function openEdit(id){
   document.getElementById('f-forma').value=a.forma||'';
   document.getElementById('f-tip').value=a.tip||'';
   document.getElementById('f-directo').value=a.directo||'';
+  document.getElementById('f-phone').value=a.phone||'';
+  document.getElementById('f-addr').value=a.addr||'';
+  const knownServices=['Tint completo','Parabrisas','Match','Lados','Atras','Ventanas laterales','Ventana trasera','Remoción de tint','Otro',''];
+  if(a.service && !knownServices.includes(a.service)){
+    document.getElementById('f-service').value='Otro';
+    document.getElementById('f-service-custom').value=a.service;
+    document.getElementById('fg-custom-service').style.display='block';
+  } else {
+    document.getElementById('f-service').value=a.service||'';
+    document.getElementById('fg-custom-service').style.display='none';
+  }
   updPrev();
   document.getElementById('modal-overlay').className='modal-overlay open';
 }
@@ -393,15 +502,21 @@ async function saveAppt(){
   if(!name||!date){alert('Necesitas nombre y fecha.');return;}
   const inst=document.getElementById('f-inst').value;
   const monto=document.getElementById('f-monto').value;
+  const rawService=document.getElementById('f-service').value;
+  const customService=document.getElementById('f-service-custom').value.trim();
+  const finalService=rawService==='Otro'&&customService?customService:rawService;
   const obj={
     date,time:document.getElementById('f-time').value,
     name,car:document.getElementById('f-car').value.trim(),
-    service:document.getElementById('f-service').value,
+    service:finalService,
+    phone:document.getElementById('f-phone').value.trim(),
+    addr:document.getElementById('f-addr').value.trim(),
     monto:flt(monto),inst,com:calcCom(monto,inst),
     pago:document.getElementById('f-pago').value,
     forma:document.getElementById('f-forma').value,
     tip:flt(document.getElementById('f-tip').value),
-    directo:flt(document.getElementById('f-directo').value)
+    directo:flt(document.getElementById('f-directo').value),
+    status:'pending'
   };
   document.querySelector('.bsave').textContent='Guardando...';
   if(editId){
@@ -414,7 +529,8 @@ async function saveAppt(){
   closeForm();
   await loadAndRender();
   document.querySelector('.bsave').textContent='Guardar cita';
-  if(selDate)showCalDay(selDate);
+  if(curView==='mes'&&selDate)showCalDay(selDate);
+  if(curView==='agenda')renderAgenda();
 }
 
 async function delAppt(id){
@@ -422,24 +538,31 @@ async function delAppt(id){
   await dbDelete(id);
   showToast('Eliminada');
   await loadAndRender();
-  if(selDate)showCalDay(selDate);
+  if(curView==='mes'&&selDate)showCalDay(selDate);
+  if(curView==='agenda')renderAgenda();
 }
 
 async function updField(id,field,val){
-  const a=appts.find(x=>x.id===id);if(!a)return;
-  a[field]=val;
-  const update={[field]:field==='monto'||field==='tip'||field==='directo'?flt(val):val};
+  const a=appts.find(x=>String(x.id)===String(id));if(!a)return;
+  a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
+  const update={[field]:a[field]};
+  if(field==='inst'){
+    // grab current monto from DOM input in case it was typed but not yet saved
+    const montoInput=document.querySelector(`input[onchange*="updField(${id},'monto"]`);
+    if(montoInput&&montoInput.value) a.monto=flt(montoInput.value);
+  }
   if(field==='monto'||field==='inst'){
     a.com=calcCom(a.monto,a.inst);
     update.com=a.com;
-    const cel=document.getElementById('com-'+id);
-    if(cel)cel.textContent=a.com>0?'$'+a.com.toFixed(2)+' ('+(a.inst==='angelo_solo'?'40%':'25%')+')':'—';
+    if(field==='inst') update.monto=a.monto;
   }
   await dbUpdate(id,update);
-  updateStats();
+  await loadAndRender();
+  if(curView==='mes'&&selDate)showCalDay(selDate);
+  if(curView==='agenda')renderAgenda();
 }
 
-// ─── TABLE BUILDER ───────────────────────────────────────────────────────────
+// ─── TABLE BUILDER ───────────────────────────────────────────
 function buildTableRows(da,tbodyId,sumElId){
   const tbody=document.getElementById(tbodyId);
   let tm=0,tc=0,td=0,tt=0;
@@ -451,29 +574,50 @@ function buildTableRows(da,tbodyId,sumElId){
       `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
       `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
   }
-  if(!da.length){tbody.innerHTML='<tr><td colspan="11" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
+  if(!da.length){tbody.innerHTML='<tr><td colspan="12" class="empty-r">No hay citas. Toca "+ Agregar" para crear una.</td></tr>';return;}
   tbody.innerHTML=da.map(a=>{
+    const id=a.id;
     const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
-    const instOpts=['angelo_solo:Angelo solo (40%)','pino:Pino','angelo_pino:Angelo y Pino (25%)'].map(o=>{const[v,l]=o.split(':');return`<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`;}).join('');
+    const instOpts=`<option value="">—</option>`+
+      [['angelo_solo','Angelo solo (40%)'],['pino','Pino'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
+        `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
     const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
-    const formaOpts=['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('');
+    const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
+    const status=a.status||'pending';
+    const isDone=status==='done';
+    const isCancel=status==='cancelled';
+    const nameColor=isDone?'#63c462':isCancel?'#f09595':'var(--accent2)';
+    const phoneLink=a.phone?`<a href="tel:${a.phone}" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📞 ${a.phone}</a>`:'';
+    const addrLink=a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px">📍 ${a.addr}</a>`:'';
+    const extraInfo=phoneLink+addrLink;
     return `<tr>
-      <td class="td-name" onclick="openEdit('${a.id}')">${a.name}</td>
+      <td style="min-width:80px;text-align:center">
+        <select class="tsel" style="width:80px;font-size:11px" onchange="updField('${id}','status',this.value)">
+          <option value="pending"${status==='pending'?' selected':''}>Pendiente</option>
+          <option value="done"${isDone?' selected':''}>✅ Hecho</option>
+          <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
+        </select>
+      </td>
+      <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+        <div style="font-weight:600;font-size:13px">${a.name}</div>
+        ${a.addr?`<a href="https://maps.google.com/?q=${encodeURIComponent(a.addr)}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:3px;text-decoration:none">📍 ${a.addr}</a>`:''}
+        ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
+      </td>
       <td class="td-time">${a.time||'—'}</td>
-      <td style="white-space:nowrap;min-width:120px">${a.car||''}${a.service?' · '+a.service:''}</td>
-      <td style="min-width:150px"><select class="tsel" onchange="updField('${a.id}','inst',this.value)"><option value="">—</option>${instOpts}</select></td>
-      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onchange="updField('${a.id}','monto',this.value)"/></td>
-      <td class="td-com" id="com-${a.id}">${ct}</td>
-      <td><select class="tsel" style="min-width:65px" onchange="updField('${a.id}','pago',this.value)">${pagoOpts}</select></td>
-      <td><select class="tsel" style="min-width:85px" onchange="updField('${a.id}','forma',this.value)"><option value="">—</option>${formaOpts}</select></td>
-      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:62px" onchange="updField('${a.id}','tip',this.value)"/></td>
-      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:72px" onchange="updField('${a.id}','directo',this.value)"/></td>
-      <td><button class="delbtn" onclick="delAppt('${a.id}')">✕</button></td>
+      <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
+      <td><input class="tinp" type="number" value="${a.monto||''}" placeholder="$0" style="width:72px" onblur="updField('${id}','monto',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td><select class="tsel" style="min-width:60px" onchange="updField('${id}','pago',this.value)">${pagoOpts}</select></td>
+      <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
+      <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
+      <td class="td-com" id="com-${id}">${ct}</td>
+      <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td><input class="tinp" type="number" value="${a.directo||''}" placeholder="$0" style="width:70px" onblur="updField('${id}','directo',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+      <td><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
     </tr>`;
   }).join('');
 }
 
-// ─── CALENDAR DAY ────────────────────────────────────────────────────────────
+// ─── CALENDAR DAY ────────────────────────────────────────────
 function showCalDay(ds){
   selDate=ds;
   const da=appts.filter(a=>a.date===ds).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
@@ -489,7 +633,148 @@ function showCalDay(ds){
   render();
 }
 
-// ─── STATS & RENDER ──────────────────────────────────────────────────────────
+// ─── AGENDA ──────────────────────────────────────────────────
+function calcAllWeekNetos(){
+  const wn={};
+  appts.forEach(a=>{
+    if(!a.date)return;
+    const d=new Date(a.date+'T12:00');
+    const dow=d.getDay();
+    const sun=new Date(d);sun.setDate(d.getDate()+(dow===0?0:7-dow));
+    const wk=mkDs(sun.getFullYear(),sun.getMonth(),sun.getDate());
+    if(!wn[wk])wn[wk]={neto:0,startDs:a.date};
+    wn[wk].neto+=flt(a.com)+flt(a.tip)-flt(a.directo);
+    if(a.date<wn[wk].startDs)wn[wk].startDs=a.date;
+  });
+  return wn;
+}
+
+function renderBalanceCard(){
+  const el=document.getElementById('balance-card');if(!el)return;
+  const wn=calcAllWeekNetos();
+  let total=0;const pw=[];
+  Object.keys(wn).forEach(wk=>{
+    const key=wn[wk].startDs;
+    if(!weekPaid[key]&&wn[wk].neto>0){
+      total+=wn[wk].neto;
+      const d=new Date(wk+'T12:00');
+      pw.push({lbl:'Sem. hasta '+d.toLocaleDateString('es-US',{month:'short',day:'numeric'}),neto:wn[wk].neto});
+    }
+  });
+  const isZero=total<=0;
+  el.className='balance-card'+(isZero?' zero':'');
+  el.innerHTML=`<div class="balance-label">Balance adeudado a Angelo</div>`+
+    `<div class="balance-amount">$${total.toFixed(2)}</div>`+
+    `<div class="balance-sub">${isZero?'Al día — no hay saldo pendiente':'Semanas pendientes de pago'}</div>`+
+    (pw.length?`<div class="balance-weeks">${pw.map(w=>`<div class="bweek-pill">${w.lbl}: $${w.neto.toFixed(2)}</div>`).join('')}</div>`:'');
+}
+
+function toggleWeekPaid(wk){
+  weekPaid[wk]=!weekPaid[wk];saveWP();renderAgenda();
+  showToast(weekPaid[wk]?'Semana marcada como pagada':'Semana pendiente');
+}
+
+function renderAgenda(){
+  const wrap=document.getElementById('agenda-wrap');
+  const dim=new Date(curYear,curMonth+1,0).getDate();
+  const todayStr=mkDs(now.getFullYear(),now.getMonth(),now.getDate());
+  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  let html='<div id="balance-card" class="balance-card"></div>';
+  let wM=0,wC=0,wD=0,wT=0,wN=0,wK='';
+
+  for(let d=1;d<=dim;d++){
+    const ds=mkDs(curYear,curMonth,d);
+    const dateObj=new Date(curYear,curMonth,d);
+    const dow=dateObj.getDay();
+    const isToday=ds===todayStr;
+    const da=appts.filter(a=>a.date===ds).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    da.forEach(a=>{wM+=flt(a.monto);wC+=flt(a.com);wD+=flt(a.directo);wT+=flt(a.tip);});
+    wN+=da.length;if(!wK)wK=ds;
+
+    html+=`<div class="agenda-day">
+      <div class="agenda-day-hdr" onclick="toggleAD('ad-${ds}')">
+        <div>
+          <div class="agenda-day-label${isToday?' is-today':''}">${days[dow]}, ${d} de ${months[curMonth]}${isToday?' — Hoy':''}</div>
+          <div class="agenda-day-sub">${da.length?da.length+' cita'+(da.length>1?'s':''):'Sin citas'}</div>
+        </div>
+        <button class="agenda-add-btn" onclick="event.stopPropagation();openForm('${ds}')">+ Agregar</button>
+      </div>
+      <div id="ad-${ds}"${da.length||isToday?'':' style="display:none"'}>`;
+
+    if(da.length){
+      let tm=0,tc=0,td=0,tt=0;
+      da.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
+      html+=`<div class="dp-sum">
+        <div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>
+        <div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>
+        <div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>
+        <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
+      </div>
+      <div class="tscroll"><table><thead><tr>
+        <th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th>
+        <th>Monto</th><th>¿Pagó?</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th>
+        <th>Tip $</th><th>Directo Angelo $</th><th></th>
+      </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
+    } else {
+      html+=`<div class="no-appt-day">Sin citas este día</div>`;
+    }
+    html+='</div></div>';
+
+    if(dow===0){
+      const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
+      html+=`<div class="week-total">
+        <div class="wt-title">Resumen semana · ${wN} cita${wN!==1?'s':''}</div>
+        <div class="wt-grid">
+          <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
+          <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
+          <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
+          <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
+        </div>
+        <div class="wt-paid-row">
+          <div>
+            <div class="wt-neto">Neto a pagar Angelo: $${net.toFixed(2)}</div>
+            <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
+          </div>
+          <button class="wt-paid-btn ${isPaid?'pagado':'pendiente'}" onclick="toggleWeekPaid('${wk}')">${isPaid?'✓ Pagado':'Marcar pagado'}</button>
+        </div>
+      </div>`;
+      wM=0;wC=0;wD=0;wT=0;wN=0;wK='';
+    }
+  }
+
+  if(new Date(curYear,curMonth,dim).getDay()!==0&&(wN>0||wM>0)){
+    const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
+    html+=`<div class="week-total">
+      <div class="wt-title">Resumen semana parcial · ${wN} cita${wN!==1?'s':''}</div>
+      <div class="wt-grid">
+        <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
+        <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
+        <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
+        <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
+      </div>
+      <div class="wt-paid-row">
+        <div>
+          <div class="wt-neto">Neto a pagar Angelo: $${net.toFixed(2)}</div>
+          <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
+        </div>
+        <button class="wt-paid-btn ${isPaid?'pagado':'pendiente'}" onclick="toggleWeekPaid('${wk}')">${isPaid?'✓ Pagado':'Marcar pagado'}</button>
+      </div>
+    </div>`;
+  }
+
+  wrap.innerHTML=html;
+  for(let d=1;d<=dim;d++){
+    const ds=mkDs(curYear,curMonth,d);
+    const da=appts.filter(a=>a.date===ds);
+    if(da.length)buildTableRows(da,'atbody-'+ds,null);
+  }
+  renderBalanceCard();
+}
+
+function toggleAD(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+
+// ─── STATS & RENDER ──────────────────────────────────────────
 function updateStats(){
   const ma=appts.filter(a=>{
     if(!a.date)return false;
@@ -504,6 +789,15 @@ function updateStats(){
   document.getElementById('s-neto').textContent='$'+(tc+tt-td).toFixed(0);
 }
 
+function setView(v){
+  curView=v;
+  document.getElementById('view-mes').style.display=v==='mes'?'block':'none';
+  document.getElementById('view-agenda').style.display=v==='agenda'?'block':'none';
+  document.getElementById('tab-mes').className='vtab'+(v==='mes'?' active':'');
+  document.getElementById('tab-agenda').className='vtab'+(v==='agenda'?' active':'');
+  if(v==='agenda')renderAgenda();
+}
+
 function changeMonth(dir){
   curMonth+=dir;
   if(curMonth<0){curMonth=11;curYear--;}
@@ -516,6 +810,7 @@ function changeMonth(dir){
 function render(){
   const mnames=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('month-lbl').textContent=mnames[curMonth]+' '+curYear;
+  document.getElementById('bnav-month-lbl').textContent=mnames[curMonth]+' '+curYear;
   const todayStr=mkDs(now.getFullYear(),now.getMonth(),now.getDate());
   const firstDay=new Date(curYear,curMonth,1).getDay();
   const dim=new Date(curYear,curMonth+1,0).getDate();
@@ -540,9 +835,10 @@ function render(){
   }
   document.getElementById('days-grid').innerHTML=html;
   updateStats();
+  if(curView==='agenda')renderAgenda();
 }
 
-// ─── REALTIME ────────────────────────────────────────────────────────────────
+// ─── REALTIME ────────────────────────────────────────────────
 sb.channel('appointments-changes')
   .on('postgres_changes',{event:'*',schema:'public',table:'appointments'},()=>{
     loadAndRender();
