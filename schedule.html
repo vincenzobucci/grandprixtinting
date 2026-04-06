@@ -420,7 +420,7 @@ async function loadAndRender(){
   if(error){showToast('Error cargando citas');console.error(error);return;}
   appts = data || [];
   await render();
-  if(userType === 'admin') renderBalanceCard(); // Only show balance to admin
+  
 }
 
 async function dbInsert(obj){
@@ -762,12 +762,14 @@ async function calcPreviousUnpaidWeeks(currentWeekStart) {
     if(a.date<wn[wk].startDs)wn[wk].startDs=a.date;
   });
   
-  // Sum ALL weeks before currentWeekStart (both positive AND negative)
+  // Sum ALL unpaid weeks before currentWeekStart (both positive AND negative)
   let accumulated = 0;
   Object.keys(wn).forEach(wk=>{
     const key=wn[wk].startDs;
-    // Include ALL weeks with non-zero neto if before current week
-    if(wn[wk].neto !== 0 && key < currentWeekStart){
+    // Check if explicitly marked as paid (weekPaid[key] === true)
+    const isMarkedAsPaid = weekPaid[key] === true;
+    // Include ALL weeks with non-zero neto (positive OR negative) if not paid and before current week
+    if(!isMarkedAsPaid && wn[wk].neto !== 0 && key < currentWeekStart){
       accumulated += wn[wk].neto;
     }
   });
@@ -775,41 +777,10 @@ async function calcPreviousUnpaidWeeks(currentWeekStart) {
   return accumulated;
 }
 
-async function addPayment(weekStart, type) {
-  const amountInput = document.getElementById(`payment-amount-${weekStart}`);
-  const amount = parseFloat(amountInput.value);
+async function toggleWeekPaid(wk){
+  weekPaid[wk]=!weekPaid[wk];saveWP();await renderAgenda();
   
-  if (!amount || amount <= 0) {
-    showToast('Ingresa un monto válido');
-    return;
-  }
-  
-  // Create a fictitious appointment to adjust the balance
-  const paymentDate = weekStart; // Use week start date
-  
-  const paymentAppt = {
-    date: paymentDate,
-    time: '23:59',
-    name: type === 'to_angelo' ? 'Pago a Angelo' : 'Pago de Angelo',
-    phone: '',
-    vehicle: 'Ajuste de pago',
-    service: 'Ajuste manual',
-    monto: 0,
-    paid: 'Si',
-    payment_method: 'Efectivo',
-    installer: 'N/A',
-    com: 0,
-    tip: type === 'from_angelo' ? amount : 0,        // If Angelo pays you, add as tip
-    directo: type === 'to_angelo' ? amount : 0,      // If you pay Angelo, add as directo
-    status: 'Hecho'
-  };
-  
-  const saved = await dbInsert(paymentAppt);
-  if (saved) {
-    showToast(`Pago de $${amount.toFixed(2)} registrado`);
-    amountInput.value = '';
-    await loadAndRender();
-  }
+  showToast(weekPaid[wk]?'Semana marcada como pagada':'Semana pendiente');
 }
 
 async function renderAgenda(){
@@ -818,7 +789,7 @@ async function renderAgenda(){
   const todayStr=mkDs(now.getFullYear(),now.getMonth(),now.getDate());
   const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  let html='<div id="balance-card" class="balance-card"></div>';
+  let html='';
   let wM=0,wC=0,wD=0,wT=0,wN=0,wK='';
 
   for(let d=1;d<=dim;d++){
@@ -883,7 +854,7 @@ async function renderAgenda(){
         if(!wK || weekDayStr < wK) wK = weekDayStr;
       }
       
-      const net=wC+wT-wD;const wk=wK;
+      const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
       
       // Calculate the Monday that starts this week (for proper "previous weeks" calculation)
       const currentWeekStart = mkDs(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate());
@@ -903,12 +874,7 @@ async function renderAgenda(){
           <div>
             <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
             ${accumulated !== 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Balance total: $${totalWithAccumulated.toFixed(2)} ${totalWithAccumulated > 0 ? '(a pagar Angelo)' : '(Angelo te debe)'}</div>` : ''}
-            <div class="wt-neto-lbl">Ajustar pagos de esta semana:</div>
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="number" placeholder="Monto" step="0.01" style="width: 80px; padding: 5px; border: 1px solid #666; border-radius: 4px; background: #2a2a2a; color: white;" id="payment-amount-${wk}">
-            <button class="wt-paid-btn pendiente" onclick="addPayment('${wk}', 'to_angelo')" title="Dinero que le pagaste a Angelo">Pagué a Angelo</button>
-            <button class="wt-paid-btn pendiente" onclick="addPayment('${wk}', 'from_angelo')" title="Dinero que Angelo te pagó">Angelo me pagó</button>
+            <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
           </div>
         </div>
       </div>`;
@@ -917,7 +883,7 @@ async function renderAgenda(){
   }
 
   if(new Date(curYear,curMonth,dim).getDay()!==0&&(wN>0||wM>0)){
-    const net=wC+wT-wD;const wk=wK;
+    const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
     
     // Calculate the Monday that starts this week (for proper "previous weeks" calculation)
     const currentWeekStart = (() => {
@@ -943,12 +909,7 @@ async function renderAgenda(){
         <div>
           <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
           ${accumulated !== 0 ? `<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Balance total: $${totalWithAccumulated.toFixed(2)} ${totalWithAccumulated > 0 ? '(a pagar Angelo)' : '(Angelo te debe)'}</div>` : ''}
-          <div class="wt-neto-lbl">Ajustar pagos de esta semana:</div>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <input type="number" placeholder="Monto" step="0.01" style="width: 80px; padding: 5px; border: 1px solid #666; border-radius: 4px; background: #2a2a2a; color: white;" id="payment-amount-${wk}">
-          <button class="wt-paid-btn pendiente" onclick="addPayment('${wk}', 'to_angelo')" title="Dinero que le pagaste a Angelo">Pagué a Angelo</button>
-          <button class="wt-paid-btn pendiente" onclick="addPayment('${wk}', 'from_angelo')" title="Dinero que Angelo te pagó">Angelo me pagó</button>
+          <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
         </div>
       </div>
     </div>`;
@@ -960,7 +921,6 @@ async function renderAgenda(){
     const da=appts.filter(a=>a.date===ds);
     if(da.length)buildTableRows(da,'atbody-'+ds,null);
   }
-  renderBalanceCard();
 }
 
 function toggleAD(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
