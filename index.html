@@ -30,7 +30,6 @@
       overflow-x:hidden;
     }
 
-    /* NOISE TEXTURE */
     body::before{
       content:'';
       position:fixed;inset:0;
@@ -38,14 +37,12 @@
       pointer-events:none;z-index:0;opacity:0.5;
     }
 
-    /* GLOW BLOBS */
     .blob1,.blob2{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:0.18}
     .blob1{width:700px;height:500px;background:var(--accent2);top:-200px;left:-200px}
     .blob2{width:600px;height:400px;background:var(--accent);bottom:-150px;right:-150px}
 
     a{color:inherit;text-decoration:none}
 
-    /* NAV */
     nav{
       position:sticky;top:0;z-index:100;
       display:flex;align-items:center;justify-content:space-between;
@@ -72,7 +69,6 @@
     }
     .nav-cta:hover{opacity:0.85}
 
-    /* HERO */
     .hero{
       position:relative;z-index:1;
       min-height:92vh;
@@ -149,7 +145,6 @@
 
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 
-    /* SECTIONS */
     .section{
       position:relative;z-index:1;
       max-width:1100px;margin:0 auto;
@@ -167,7 +162,6 @@
     }
     .divider{border:none;border-top:1px solid var(--card-border);margin:0}
 
-    /* SERVICES */
     .services-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -190,7 +184,6 @@
     .service-card h3{font-size:17px;font-weight:600;margin-bottom:6px}
     .service-card p{font-size:14px;color:var(--muted)}
 
-    /* REVIEWS */
     .reviews-header{
       display:flex;align-items:flex-end;justify-content:space-between;
       flex-wrap:wrap;gap:16px;margin-bottom:32px;
@@ -203,7 +196,6 @@
       padding:16px 20px;
     }
     .rating-num{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--accent);line-height:1}
-    .rating-right{}
     .stars{color:#fbbf24;font-size:18px;letter-spacing:2px}
     .rating-count{font-size:13px;color:var(--muted);margin-top:2px}
     .reviews-grid{
@@ -239,7 +231,6 @@
     }
     .review-cta:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
 
-    /* SOCIAL */
     .social-grid{display:flex;gap:12px;flex-wrap:wrap}
     .social-btn{
       display:inline-flex;align-items:center;gap:10px;
@@ -251,7 +242,6 @@
     .social-btn:hover{border-color:rgba(255,255,255,0.2);transform:translateY(-2px)}
     .social-btn svg{width:20px;height:20px;flex-shrink:0}
 
-    /* VIN */
     .vin-wrap{
       background:var(--card);
       border:1px solid var(--card-border);
@@ -288,7 +278,6 @@
     .kv{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:13px}
     .kv div:nth-child(odd){color:var(--muted)}
 
-    /* CONTACT */
     .contact-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -327,7 +316,6 @@
     .info-card-val a{color:var(--accent)}
     .info-card-sub{font-size:13px;color:var(--muted);margin-top:2px}
 
-    /* FOOTER */
     footer{
       position:relative;z-index:1;
       text-align:center;padding:32px 24px;
@@ -336,7 +324,6 @@
     }
     footer strong{color:var(--text)}
 
-    /* MOBILE NAV */
     @media(max-width:600px){
       .nav-links{display:none}
       .hero h1{font-size:64px}
@@ -348,7 +335,6 @@
 <div class="blob1"></div>
 <div class="blob2"></div>
 
-<!-- NAV -->
 <nav>
   <div class="nav-brand">
     <img src="LOGOBIEN.JPEG" alt="Grand Prix Accessories logo"/>
@@ -363,7 +349,6 @@
   <a class="nav-cta" href="tel:+17865238793">📞 Call Now</a>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-eyebrow">
     <span>Mobile Service · Miami Dade &amp; Broward</span>
@@ -373,7 +358,6 @@
   <div class="hero-ctas">
     <a class="btn-primary" href="tel:+17865238793">📞 Call or Text</a>
     <a class="btn-ghost" href="#contact">📅 Request Appointment</a>
-
   </div>
   <p class="hero-tip">Mon – Sat · 9 AM to 5 PM</p>
   <div class="hero-stats">
@@ -394,7 +378,6 @@
 
 <hr class="divider"/>
 
-<!-- SERVICES -->
 <section class="section" id="services">
   <div class="section-label">What we do</div>
   <div class="section-title">Our Services</div>
@@ -425,7 +408,6 @@
 
 <hr class="divider"/>
 
-<!-- REVIEWS -->
 <section class="section" id="reviews">
   <div class="section-label">What clients say</div>
   <div class="reviews-header">
@@ -440,7 +422,6 @@
   </div>
 
   <div class="reviews-grid">
-
     <div class="review-card">
       <div class="review-top">
         <div class="review-avatar">JJ</div>
@@ -536,7 +517,6 @@
       <div class="review-stars">★★★★★</div>
       <p class="review-text">"Where is ten stars?!? So glad I found these guys. Just did tint and lights on my Mercedes C 300. Lots more audio/visual work to come on my truck. Thanks!!!"</p>
     </div>
-
   </div>
 
   <a class="review-cta" href="https://www.google.com/maps/place/Grand+Prix+Accesories+LLC" target="_blank" rel="noreferrer">
@@ -546,7 +526,6 @@
 
 <hr class="divider"/>
 
-<!-- SOCIAL -->
 <section class="section" id="social">
   <div class="section-label">Follow us</div>
   <div class="section-title">Social Media</div>
@@ -568,36 +547,34 @@
 
 <hr class="divider"/>
 
-<!-- VIN DECODER -->
 <section class="section" id="vin">
   <div class="section-label">Installer tool</div>
   <div class="section-title">VIN Decoder</div>
-<div class="vin-wrap">
-  <label for="vinInput">Enter 17-character VIN</label>
-  <input class="vin-input" id="vinInput" maxlength="17" placeholder="1HGBH41JXMN109186" autocomplete="off" spellcheck="false"/>
+  <div class="vin-wrap">
+    <label for="vinInput">Enter 17-character VIN</label>
+    <input class="vin-input" id="vinInput" maxlength="17" placeholder="1HGBH41JXMN109186" autocomplete="off" spellcheck="false"/>
 
-  <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-    <label for="vinCamera" class="vin-clear" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
-      📷 Scan VIN
-    </label>
-    <input id="vinCamera" type="file" accept="image/*" capture="environment" style="display:none;">
-  </div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <label for="vinCamera" class="vin-clear" style="display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+        📷 Scan VIN
+      </label>
+      <input id="vinCamera" type="file" accept="image/*" capture="environment" style="display:none;">
+    </div>
 
-  <div class="vin-btns">
-    <button class="vin-decode" id="decodeBtn">Decode VIN</button>
-    <button class="vin-clear" id="clearBtn">Clear</button>
+    <div class="vin-btns">
+      <button class="vin-decode" id="decodeBtn">Decode VIN</button>
+      <button class="vin-clear" id="clearBtn">Clear</button>
+    </div>
+    <div class="vin-status" id="vinStatus">Ready.</div>
+    <div class="vin-result" id="vinResult">
+      <div class="kv" id="vinKV"></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px">Data source: NHTSA public API. Some trims/body styles may have limited data.</p>
   </div>
-  <div class="vin-status" id="vinStatus">Ready.</div>
-  <div class="vin-result" id="vinResult">
-    <div class="kv" id="vinKV"></div>
-  </div>
-  <p style="font-size:12px;color:var(--muted);margin-top:12px">Data source: NHTSA public API. Some trims/body styles may have limited data.</p>
-</div>
 </section>
 
 <hr class="divider"/>
 
-<!-- CONTACT -->
 <section class="section" id="contact">
   <div class="section-label">Get in touch</div>
   <div class="section-title">Contact Us</div>
@@ -626,12 +603,10 @@
         <div class="info-card-val" style="font-size:15px">Miami Dade &amp; Broward County</div>
         <div class="info-card-sub">We come to your location</div>
       </div>
-
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <strong>Grand Prix Accessories LLC</strong> · Miami Window Tinting<br>
   <span id="fyear"></span> · <a href="tel:+17865238793" style="color:var(--accent)">(786) 523-8793</a>
@@ -650,7 +625,8 @@
   </a>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
 document.getElementById('fyear').textContent = '© ' + new Date().getFullYear();
 
 function handleContact(){
@@ -666,21 +642,105 @@ const vinInput = document.getElementById('vinInput');
 const statusEl = document.getElementById('vinStatus');
 const resultBox = document.getElementById('vinResult');
 const kvEl = document.getElementById('vinKV');
+const vinCamera = document.getElementById('vinCamera');
+
+function cleanVinFromOCR(text){
+  if(!text) return '';
+  let s = String(text).toUpperCase().replace(/[^A-Z0-9]/g,'');
+  s = s.replace(/I/g,'1').replace(/O/g,'0').replace(/Q/g,'0');
+  const match = s.match(/[A-HJ-NPR-Z0-9]{17}/);
+  return match ? match[0] : '';
+}
+
+function loadTesseract(){
+  return new Promise((resolve,reject)=>{
+    if(window.Tesseract) return resolve();
+
+    const existing = document.querySelector('script[data-tesseract="1"]');
+    if(existing){
+      existing.addEventListener('load',()=>resolve(),{once:true});
+      existing.addEventListener('error',()=>reject(new Error('Failed to load Tesseract')),{once:true});
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    script.async = true;
+    script.dataset.tesseract = '1';
+    script.onload = ()=>resolve();
+    script.onerror = ()=>reject(new Error('Failed to load Tesseract'));
+    document.head.appendChild(script);
+  });
+}
+
+if(vinCamera){
+  vinCamera.addEventListener('change', async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+
+    statusEl.textContent = 'Preparing scanner…';
+    resultBox.style.display = 'none';
+
+    try{
+      await loadTesseract();
+
+      const result = await window.Tesseract.recognize(file, 'eng', {
+        logger: m => {
+          if(m.status === 'recognizing text'){
+            statusEl.textContent = 'Reading VIN… ' + Math.round((m.progress || 0) * 100) + '%';
+          }
+        }
+      });
+
+      const rawText = result?.data?.text || '';
+      const vin = cleanVinFromOCR(rawText);
+
+      if(vin){
+        vinInput.value = vin;
+        statusEl.textContent = 'VIN detected ✅';
+      }else{
+        statusEl.textContent = "Couldn't detect a full VIN. Try closer and reduce windshield glare.";
+      }
+    }catch(err){
+      console.error(err);
+      statusEl.textContent = 'Scan failed. Please type the VIN manually.';
+    }
+
+    vinCamera.value = '';
+  });
+}
 
 document.getElementById('clearBtn').addEventListener('click',()=>{
-  vinInput.value='';kvEl.innerHTML='';resultBox.style.display='none';
-  statusEl.textContent='Ready.';vinInput.focus();
+  vinInput.value='';
+  kvEl.innerHTML='';
+  resultBox.style.display='none';
+  statusEl.textContent='Ready.';
+  if(vinCamera) vinCamera.value='';
+  vinInput.focus();
 });
 
 document.getElementById('decodeBtn').addEventListener('click', async()=>{
   const vin=(vinInput.value||'').trim().toUpperCase();
-  if(vin.length!==17){statusEl.textContent='VIN must be 17 characters.';resultBox.style.display='none';return;}
-  statusEl.textContent='Decoding…';resultBox.style.display='none';kvEl.innerHTML='';
+  if(vin.length!==17){
+    statusEl.textContent='VIN must be 17 characters.';
+    resultBox.style.display='none';
+    return;
+  }
+
+  statusEl.textContent='Decoding…';
+  resultBox.style.display='none';
+  kvEl.innerHTML='';
+
   try{
     const res=await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${vin}?format=json`);
     const data=await res.json();
     const r=data?.Results?.[0];
-    if(!r){statusEl.textContent='No results returned.';return;}
+
+    if(!r){
+      statusEl.textContent='No results returned.';
+      return;
+    }
+
     const fields=[
       ['Year',r.ModelYear],['Make',r.Make],['Model',r.Model],['Trim',r.Trim],
       ['Body Class',r.BodyClass],['Doors',r.Doors],['Drive Type',r.DriveType],
@@ -688,6 +748,24 @@ document.getElementById('decodeBtn').addEventListener('click', async()=>{
       ['Vehicle Type',r.VehicleType],
       ['Plant',[r.PlantCity,r.PlantState,r.PlantCountry].filter(Boolean).join(', ')],
     ];
-    kvEl.innerHTML=fields.filter(([k,v])=>v&&String(v).trim()&&v!=='Not Applicable')
-      .map(([k,v])=>`<div>${k}</div><div><b>${String(v)}</b></div>`).join('');
-    if(!kvEl.innerHTML)kvEl.innerHTML=`<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, limited data.</b></div>`;
+
+    kvEl.innerHTML = fields
+      .filter(([k,v]) => v && String(v).trim() && v !== 'Not Applicable')
+      .map(([k,v]) => `<div>${k}</div><div><b>${String(v)}</b></div>`)
+      .join('');
+
+    if(!kvEl.innerHTML){
+      kvEl.innerHTML = `<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, limited data.</b></div>`;
+    }
+
+    resultBox.style.display='block';
+    statusEl.textContent='Decoded successfully.';
+  }catch(err){
+    console.error(err);
+    resultBox.style.display='none';
+    statusEl.textContent='Error decoding VIN.';
+  }
+});
+</script>
+</body>
+</html>
