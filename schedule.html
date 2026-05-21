@@ -566,8 +566,7 @@ async function updField(id,field,val){
   a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
   const update={[field]:a[field]};
   if(field==='inst'){
-    const montoInput=document.querySelector(`input[onblur*="updField('${id}','monto"]`);
-    if(montoInput&&montoInput.value) a.monto=flt(montoInput.value);
+    // a.monto already has the correct value from memory; no need to read DOM
   }
   if(field==='monto'||field==='inst'){
     a.com=calcCom(a.monto,a.inst);
@@ -577,7 +576,7 @@ async function updField(id,field,val){
   await dbUpdate(id,update);
   // Refresh only the affected table without reloading all data (preserves order)
   if(curView==='mes'&&selDate){
-    const da=appts.filter(a=>a.date===selDate);
+    const da=appts.filter(x=>x.date===selDate);
     buildTableRows(da,'cal-tbody','dp-sum');
   }
   if(curView==='agenda'){
@@ -586,6 +585,17 @@ async function updField(id,field,val){
     if(document.getElementById(tbodyId)){
       const da=appts.filter(x=>x.date===ds);
       buildTableRows(da,tbodyId,null);
+      // Also refresh the daily summary bar in agenda view
+      const sumEl=document.getElementById('agsum-'+ds);
+      if(sumEl){
+        let tm=0,tc=0,td=0,tt=0;
+        da.forEach(x=>{tm+=flt(x.monto);tc+=flt(x.com);td+=flt(x.directo);tt+=flt(x.tip);});
+        sumEl.innerHTML=
+          `<div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>`+
+          `<div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>`+
+          `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
+          `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
+      }
     }
   }
 }
@@ -828,7 +838,7 @@ async function renderAgenda(){
     if(da.length){
       let tm=0,tc=0,td=0,tt=0;
       da.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
-      html+=`<div class="dp-sum">
+      html+=`<div class="dp-sum" id="agsum-${ds}">
         <div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>
         <div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>
         <div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>
