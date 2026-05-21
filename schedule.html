@@ -1,4 +1,3 @@
-
 <!doctype html>
 
 <html lang="en">
@@ -179,14 +178,19 @@ td:last-child{border-right:none}
 .toast.show{opacity:1}
 
 /* Employee restrictions */
-.employee .add-btn,
-.employee .dp-add,
-.employee .agenda-add-btn,
 .employee #balance-card,
 .employee .delbtn,
 .employee .dp-sum,
 .employee .sum-i,
 .employee .stats { display: none !important; }
+/* Hide financial fields in modal for employees */
+.employee #fg-monto,
+.employee #fg-inst,
+.employee #fg-pago,
+.employee #fg-forma,
+.employee #fg-tip,
+.employee #fg-directo,
+.employee #fg-cprev { display: none !important; }
 ```
 
   </style>
@@ -313,9 +317,9 @@ td:last-child{border-right:none}
       <label>Describe el servicio</label>
       <input id="f-service-custom" placeholder="Escribe el servicio aquí..."/>
     </div>
-    <div class="frow">
+    <div class="frow" id="fg-monto">
       <div class="fg"><label>Monto ($)</label><input type="number" id="f-monto" placeholder="0.00" inputmode="decimal" oninput="updPrev()"/></div>
-      <div class="fg"><label>Instalador</label>
+      <div class="fg" id="fg-inst"><label>Instalador</label>
         <select id="f-inst" onchange="updPrev()">
           <option value="">Seleccionar...</option>
           <option value="angelo_solo">Angelo solo — 40%</option>
@@ -324,18 +328,18 @@ td:last-child{border-right:none}
         </select>
       </div>
     </div>
-    <div class="cprev" id="cprev">Selecciona instalador y monto</div>
-    <div class="frow">
+    <div class="cprev" id="fg-cprev"><div id="cprev">Selecciona instalador y monto</div></div>
+    <div class="frow" id="fg-pago">
       <div class="fg"><label>¿Pagó?</label>
         <select id="f-pago"><option value="">—</option><option value="si">Sí</option><option value="no">No</option></select>
       </div>
-      <div class="fg"><label>Forma de pago</label>
+      <div class="fg" id="fg-forma"><label>Forma de pago</label>
         <select id="f-forma"><option value="">—</option><option>Cash</option><option>Zelle</option><option>Tarjeta</option><option>Cheque</option><option>Quickbooks</option><option>Otro</option></select>
       </div>
     </div>
-    <div class="frow">
+    <div class="frow" id="fg-tip">
       <div class="fg"><label>Tip ($)</label><input type="number" id="f-tip" placeholder="0.00" inputmode="decimal"/></div>
-      <div class="fg"><label>Pagó directo a Angelo ($)</label><input type="number" id="f-directo" placeholder="0.00" inputmode="decimal"/></div>
+      <div class="fg" id="fg-directo"><label>Pagó directo a Angelo ($)</label><input type="number" id="f-directo" placeholder="0.00" inputmode="decimal"/></div>
     </div>
     <div class="fg"><label>Dirección</label><input id="f-addr" placeholder="123 SW 8th St, Miami FL 33130"/></div>
     <button class="bsave" onclick="saveAppt()">Guardar cita</button>
@@ -395,7 +399,7 @@ function doLogout(){
   document.getElementById('app').style.display='none';
 }
 (function(){
-  try{const u=sessionStorage.getItem('gp_user');if(u&&USERS[u]){currentUser=u;document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';document.getElementById('user-badge').textContent=u;loadAndRender();}}catch(e){}
+  try{const u=sessionStorage.getItem('gp_user');if(u&&USERS[u]){currentUser=u;userType=u==='alejandro'?'employee':'admin';document.body.className=userType==='employee'?'employee':'admin';document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';document.getElementById('user-badge').textContent=u;loadAndRender();}}catch(e){}
 })();
 document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
@@ -475,6 +479,7 @@ function openForm(dv){
   document.getElementById('f-service-custom').value='';
   document.getElementById('fg-custom-service').style.display='none';
   document.getElementById('cprev').textContent='Selecciona instalador y monto';
+  document.getElementById('fg-cprev').style.display=userType==='employee'?'none':'block';
   document.getElementById('modal-overlay').className='modal-overlay open';
 }
 function openEdit(id){
@@ -561,8 +566,7 @@ async function updField(id,field,val){
   a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
   const update={[field]:a[field]};
   if(field==='inst'){
-    // grab current monto from DOM input in case it was typed but not yet saved
-    const montoInput=document.querySelector(`input[onchange*="updField(${id},'monto"]`);
+    const montoInput=document.querySelector(`input[onblur*="updField('${id}','monto"]`);
     if(montoInput&&montoInput.value) a.monto=flt(montoInput.value);
   }
   if(field==='monto'||field==='inst'){
@@ -571,9 +575,19 @@ async function updField(id,field,val){
     if(field==='inst') update.monto=a.monto;
   }
   await dbUpdate(id,update);
-  await loadAndRender();
-  if(curView==='mes'&&selDate)showCalDay(selDate);
-  if(curView==='agenda')await renderAgenda();
+  // Refresh only the affected table without reloading all data (preserves order)
+  if(curView==='mes'&&selDate){
+    const da=appts.filter(a=>a.date===selDate);
+    buildTableRows(da,'cal-tbody','dp-sum');
+  }
+  if(curView==='agenda'){
+    const ds=a.date;
+    const tbodyId='atbody-'+ds;
+    if(document.getElementById(tbodyId)){
+      const da=appts.filter(x=>x.date===ds);
+      buildTableRows(da,tbodyId,null);
+    }
+  }
 }
 
 // ─── TABLE BUILDER ───────────────────────────────────────────
@@ -587,8 +601,10 @@ function getTableHeaders() {
 
 function buildTableRows(da,tbodyId,sumElId){
   const tbody=document.getElementById(tbodyId);
+  // Always sort by time so adding payments never reorders
+  const sorted=[...da].sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   let tm=0,tc=0,td=0,tt=0;
-  da.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
+  sorted.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
   
   // Only show financial summary for admin users
   if(sumElId && userType === 'admin'){
@@ -599,13 +615,13 @@ function buildTableRows(da,tbodyId,sumElId){
       `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
   }
   
-  if(!da.length){
+  if(!sorted.length){
     const colspan = userType === 'employee' ? 5 : 12;
     tbody.innerHTML=`<tr><td colspan="${colspan}" class="empty-r">No hay citas. ${userType === 'admin' ? 'Toca "+ Agregar" para crear una.' : ''}</td></tr>`;
     return;
   }
   
-  tbody.innerHTML=da.map(a=>{
+  tbody.innerHTML=sorted.map(a=>{
     const id=a.id;
     const status=a.status||'pending';
     const isDone=status==='done';
@@ -622,10 +638,10 @@ function buildTableRows(da,tbodyId,sumElId){
             <option value="cancelled"${isCancel?' selected':''}>❌ No</option>
           </select>
         </td>
-        <td style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
+        <td onclick="openEdit('${id}')" style="cursor:pointer;color:${nameColor};min-width:150px;max-width:180px">
           <div style="font-weight:600;font-size:13px">${a.name}</div>
           ${a.addr?`<div style="color:var(--accent2);font-size:11px;margin-top:3px">📍 ${a.addr}</div>`:''}
-          ${a.phone?`<div style="color:var(--accent2);font-size:11px;margin-top:2px">📞 ${a.phone}</div>`:''}
+          ${a.phone?`<a href="tel:${a.phone}" onclick="event.stopPropagation()" style="color:var(--accent2);font-size:11px;display:block;margin-top:2px;text-decoration:none">📞 ${a.phone}</a>`:''}
         </td>
         <td class="td-time">${a.time||'—'}</td>
         <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
