@@ -561,6 +561,48 @@ async function delAppt(id){
   if(curView==='agenda')await renderAgenda();
 }
 
+async function refreshWeekSummary(dateStr){
+  // Find the Monday of the week containing dateStr
+  const d = new Date(dateStr+'T12:00');
+  const dow = d.getDay(); // 0=Sun,1=Mon...
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - (dow===0 ? 6 : dow-1));
+  const wkStart = mkDs(monday.getFullYear(), monday.getMonth(), monday.getDate());
+
+  // Sum all 7 days of that week
+  let wM=0,wC=0,wD=0,wT=0,wN=0;
+  for(let i=0;i<7;i++){
+    const day=new Date(monday);day.setDate(monday.getDate()+i);
+    const ds=mkDs(day.getFullYear(),day.getMonth(),day.getDate());
+    appts.filter(a=>a.date===ds).forEach(a=>{
+      wM+=flt(a.monto);wC+=flt(a.com);wD+=flt(a.directo);wT+=flt(a.tip);wN++;
+    });
+  }
+  const net=wC+wT-wD;
+  const isPaid=weekPaid[wkStart]||false;
+  const accumulated=await calcPreviousUnpaidWeeks(wkStart);
+  const totalWithAccumulated=net+accumulated;
+
+  const el=document.getElementById('wt-'+wkStart);
+  if(!el)return;
+  el.innerHTML=`
+    <div class="wt-title">Resumen semana · ${wN} cita${wN!==1?'s':''}</div>
+    <div class="wt-grid">
+      <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
+      <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
+      <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
+      <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
+      ${accumulated!==0?`<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">${accumulated>0?'Acumulado semanas anteriores':'Angelo tiene crédito de semanas anteriores'}</div></div>`:''}
+    </div>
+    <div class="wt-paid-row">
+      <div>
+        <div class="wt-neto">Neto semana actual: $${net.toFixed(2)}</div>
+        ${accumulated!==0?`<div class="wt-neto" style="color:var(--accent2);font-size:16px;">Balance total: $${totalWithAccumulated.toFixed(2)} ${totalWithAccumulated>0?'(a pagar Angelo)':'(Angelo te debe)'}</div>`:''}
+        <div class="wt-neto-lbl">${isPaid?'✓ Pagado a Angelo':'Pendiente de pago'}</div>
+      </div>
+    </div>`;
+}
+
 async function updField(id,field,val){
   const a=appts.find(x=>String(x.id)===String(id));if(!a)return;
   a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
@@ -597,6 +639,8 @@ async function updField(id,field,val){
           `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
       }
     }
+    // Always refresh the week summary block
+    await refreshWeekSummary(a.date);
   }
 }
 
@@ -885,7 +929,7 @@ async function renderAgenda(){
       
       const accumulated = await calcPreviousUnpaidWeeks(currentWeekStart);
       const totalWithAccumulated = net + accumulated;
-      html+=`<div class="week-total">
+      html+=`<div class="week-total" id="wt-${wK}">
         <div class="wt-title">Resumen semana · ${wN} cita${wN!==1?'s':''}</div>
         <div class="wt-grid">
           <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
@@ -920,7 +964,7 @@ async function renderAgenda(){
     
     const accumulated = await calcPreviousUnpaidWeeks(currentWeekStart);
     const totalWithAccumulated = net + accumulated;
-    html+=`<div class="week-total">
+    html+=`<div class="week-total" id="wt-${wK}">
       <div class="wt-title">Resumen semana parcial · ${wN} cita${wN!==1?'s':''}</div>
       <div class="wt-grid">
         <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
