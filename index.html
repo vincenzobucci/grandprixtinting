@@ -682,4 +682,13 @@ document.getElementById('decodeBtn').addEventListener('click', async()=>{
     ];
     kvEl.innerHTML=fields.filter(([k,v])=>v&&String(v).trim()&&v!=='Not Applicable')
       .map(([k,v])=>`<div>${k}</div><div><b>${String(v)}</b></div>`).join('');
-    if(!kvEl.innerHTML)kvEl.innerHTML=`<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, limited data.</b></div>`;
+    if(!kvEl.innerHTML)kvEl.innerHTML=`<div>VIN</div><div><b>${vin}</b></div><div>Status</div><div><b>Decoded, limited data.</b></div>`;    resultBox.style.display='block';
+    statusEl.textContent='Decoded.';
+  }catch(error){
+    statusEl.textContent='Unable to decode VIN. Please try again.';
+    console.error('VIN decode failed:', error);
+  }
+});
+</script>
+</body>
+</html>
