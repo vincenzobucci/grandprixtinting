@@ -188,6 +188,7 @@ td:last-child{border-right:none}
 .employee #fg-pago,
 .employee #fg-forma,
 .employee #fg-tip,
+.employee #fg-tip-alejandro,
 .employee #fg-directo,
 .employee #fg-cprev { display: none !important; }
 
@@ -338,10 +339,11 @@ td:last-child{border-right:none}
       </div>
     </div>
     <div class="frow" id="fg-tip">
-      <div class="fg"><label>Tip ($)</label><input type="number" id="f-tip" placeholder="0.00" inputmode="decimal"/></div>
+      <div class="fg"><label>Tip Angelo ($)</label><input type="number" id="f-tip" placeholder="0.00" inputmode="decimal"/></div>
       <div class="fg" id="fg-directo"><label>Pagó directo a Angelo ($)</label><input type="number" id="f-directo" placeholder="0.00" inputmode="decimal"/></div>
     </div>
     <div class="fg"><label>Dirección</label><input id="f-addr" placeholder="123 SW 8th St, Miami FL 33130"/></div>
+    <div class="fg" id="fg-tip-alejandro"><label>Tip Alejandro ($)</label><input type="number" id="f-tip-alejandro" min="0" step="0.01" placeholder="0.00" inputmode="decimal"/></div>
     <button class="bsave" onclick="saveAppt()">Guardar cita</button>
     <span class="bcancel" onclick="closeForm()">Cancelar</span>
   </div>
@@ -466,9 +468,19 @@ function money(v){return '$'+flt(v).toFixed(2);}
 function calcCom(m,i){return Math.round(flt(m)*installerInfo(i)[2]*100)/100;}
 function calcAlejandro(m,i){return Math.round(flt(m)*installerInfo(i)[3]*100)/100;}
 function alejandroTotal(rows){return rows.reduce((sum,a)=>sum+calcAlejandro(a.monto,a.inst),0);}
+function alejandroTips(rows){return rows.reduce((sum,a)=>sum+flt(a.tip_alejandro),0);}
+function alejandroToPay(rows){return alejandroTotal(rows)+alejandroTips(rows);}
 function alejandroWeekCard(rows){
-  return `<div class="wt-item"><div class="wn">${money(alejandroTotal(rows))}</div><div class="wl">Comisión Alejandro</div></div>`;
+  return `<div class="wt-item"><div class="wn">${money(alejandroTotal(rows))}</div><div class="wl">Comisión Alejandro</div></div>`+
+    `<div class="wt-item"><div class="wn">${money(alejandroTips(rows))}</div><div class="wl">Tips Alejandro</div></div>`+
+    `<div class="wt-item"><div class="wn">${money(alejandroToPay(rows))}</div><div class="wl">Total a pagar Alejandro</div></div>`;
 }
+function alejandroDailySummary(rows){
+  return `<div class="sum-i">Comisión Alejandro: <span>${money(alejandroTotal(rows))}</span></div>`+
+    `<div class="sum-i">Tips Alejandro: <span>${money(alejandroTips(rows))}</span></div>`+
+    `<div class="sum-i">Total a pagar Alejandro: <span>${money(alejandroToPay(rows))}</span></div>`;
+}
+
 function updPrev(){
   const m=document.getElementById('f-monto').value;
   const i=document.getElementById('f-inst').value;
@@ -491,7 +503,7 @@ function openForm(dv){
   document.getElementById('mtitle').textContent='Nueva cita';
   document.getElementById('f-date').value=dv||mkDs(curYear,curMonth,now.getDate());
   document.getElementById('f-time').value='09:00';
-  ['f-name','f-car','f-monto','f-tip','f-directo'].forEach(id=>document.getElementById(id).value='');
+  ['f-name','f-car','f-monto','f-tip','f-tip-alejandro','f-directo'].forEach(id=>document.getElementById(id).value='');
   ['f-service','f-inst','f-pago','f-forma'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-phone').value='';
   document.getElementById('f-addr').value='';
@@ -516,6 +528,7 @@ function openEdit(id){
   document.getElementById('f-pago').value=a.pago||'';
   document.getElementById('f-forma').value=a.forma||'';
   document.getElementById('f-tip').value=a.tip||'';
+  document.getElementById('f-tip-alejandro').value=a.tip_alejandro||'';
   document.getElementById('f-directo').value=a.directo||'';
   document.getElementById('f-phone').value=a.phone||'';
   document.getElementById('f-addr').value=a.addr||'';
@@ -553,11 +566,12 @@ async function saveAppt(){
     pago:document.getElementById('f-pago').value,
     forma:document.getElementById('f-forma').value,
     tip:flt(document.getElementById('f-tip').value),
+    tip_alejandro:flt(document.getElementById('f-tip-alejandro').value),
     directo:flt(document.getElementById('f-directo').value),
     status:editId?(appts.find(a=>String(a.id)===String(editId))?.status||'pending'):'pending'
   };
   if(userType==='employee'){
-    ['monto','inst','com','pago','forma','tip','directo'].forEach(key=>delete obj[key]);
+    ['monto','inst','com','pago','forma','tip','tip_alejandro','directo'].forEach(key=>delete obj[key]);
   }
   const saveButton=document.querySelector('.bsave');
   if(saveButton.disabled)return;
@@ -638,7 +652,7 @@ async function refreshWeekSummary(dateStr){
 async function updField(id,field,val){
   const a=appts.find(x=>String(x.id)===String(id));if(!a)return;
   if(userType==='employee'&&field!=='status')return;
-  a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
+  a[field]=field==='monto'||field==='tip'||field==='tip_alejandro'||field==='directo'?flt(val):val;
   const update={[field]:a[field]};
   if(field==='inst'){
     // a.monto already has the correct value from memory; no need to read DOM
@@ -672,7 +686,7 @@ async function updField(id,field,val){
           `<div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>`+
           `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
           `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`+
-      `<div class="sum-i">Comisión Alejandro: <span>${money(alejandroTotal(sorted))}</span></div>`;
+      alejandroDailySummary(da);
       }
     }
     // Always refresh the week summary block
@@ -685,7 +699,7 @@ function getTableHeaders() {
   if (userType === 'employee') {
     return '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Instalador</th>';
   } else {
-    return '<th></th><th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>Directo Angelo $</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Comisión Alejandro</th><th>Tip $</th>';
+    return '<th></th><th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>Directo Angelo $</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Comisión Alejandro</th><th>Tip Angelo $</th><th>Tip Alejandro $</th>';
   }
 }
 
@@ -702,11 +716,11 @@ function buildTableRows(da,tbodyId,sumElId){
       `<div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>`+
       `<div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>`+
       `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
-      `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
+      `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`+alejandroDailySummary(sorted);
   }
   
   if(!sorted.length){
-    const colspan = userType === 'employee' ? 5 : 12;
+    const colspan = userType === 'employee' ? 5 : 13;
     tbody.innerHTML=`<tr><td colspan="${colspan}" class="empty-r">No hay citas. ${userType === 'admin' ? 'Toca "+ Agregar" para crear una.' : ''}</td></tr>`;
     return;
   }
@@ -769,6 +783,7 @@ function buildTableRows(da,tbodyId,sumElId){
         <td class="td-com" id="com-${id}">${ct}</td>
         <td class="td-com">${money(calcAlejandro(a.monto,a.inst))}</td>
         <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="tinp" type="number" min="0" step="0.01" value="${a.tip_alejandro||''}" placeholder="$0" style="width:70px" onblur="updField('${id}','tip_alejandro',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
       </tr>`;
     }
   }).join('');
@@ -924,7 +939,7 @@ async function renderAgenda(){
         <div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>
         <div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>
         <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
-      </div>`;
+      ${alejandroDailySummary(da)}</div>`;
       html+=`<div class="tscroll"><table><thead><tr>
         ${getTableHeaders()}
       </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
