@@ -16,7 +16,6 @@
     .blob1{width:600px;height:400px;background:var(--accent2);top:-150px;left:-150px}
     .blob2{width:500px;height:350px;background:var(--accent);bottom:-100px;right:-100px}
 
-```
 /* LOGIN */
 #login-screen{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px}
 .login-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--cb);border-radius:24px;padding:36px 32px;position:relative;z-index:1;animation:fadeUp 0.5s ease both}
@@ -191,7 +190,6 @@ td:last-child{border-right:none}
 .employee #fg-tip,
 .employee #fg-directo,
 .employee #fg-cprev { display: none !important; }
-```
 
   </style>
 </head>
@@ -233,9 +231,9 @@ td:last-child{border-right:none}
       <div class="scard"><div class="sn" id="s-ing">$0</div><div class="sl">Ingresos</div></div>
       <div class="scard"><div class="sn" id="s-com">$0</div><div class="sl">Comisión Angelo</div></div>
       <div class="scard"><div class="sn" id="s-neto">$0</div><div class="sl">Neto Angelo</div></div>
+      <div class="scard"><div class="sn" id="s-alejandro">$0</div><div class="sl">Comisión Alejandro</div></div>
     </div>
 
-```
 <div class="cal-top">
   <div class="cal-nav-btns">
     <button class="cnb" onclick="changeMonth(-1)">&#8592;</button>
@@ -279,7 +277,6 @@ td:last-child{border-right:none}
 <div id="view-agenda" style="display:none">
   <div class="agenda-wrap" id="agenda-wrap"></div>
 </div>
-```
 
   </div>
 </div>
@@ -325,6 +322,9 @@ td:last-child{border-right:none}
           <option value="angelo_solo">Angelo solo — 40%</option>
           <option value="pino">Pino</option>
           <option value="angelo_pino">Angelo y Pino — 25%</option>
+          <option value="alejandro_solo">Alejandro solo — 30%</option>
+          <option value="alejandro_pino">Alejandro y Pino — 20%</option>
+          <option value="angelo_alejandro">Angelo y Alejandro — 25% / 15%</option>
         </select>
       </div>
     </div>
@@ -334,7 +334,7 @@ td:last-child{border-right:none}
         <select id="f-pago"><option value="">—</option><option value="si">Sí</option><option value="no">No</option></select>
       </div>
       <div class="fg" id="fg-forma"><label>Forma de pago</label>
-        <select id="f-forma"><option value="">—</option><option>Cash</option><option>Zelle</option><option>Tarjeta</option><option>Cheque</option><option>Quickbooks</option><option>Otro</option></select>
+        <select id="f-forma"><option value="">—</option><option>Cash</option><option>Zelle</option><option>Tarjeta</option><option>Cheque</option><option>Quickbooks</option><option>Cash App</option><option>Venmo</option><option>Square</option><option>Otro</option></select>
       </div>
     </div>
     <div class="frow" id="fg-tip">
@@ -398,9 +398,6 @@ function doLogout(){
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
 }
-(function(){
-  try{const u=sessionStorage.getItem('gp_user');if(u&&USERS[u]){currentUser=u;userType=u==='alejandro'?'employee':'admin';document.body.className=userType==='employee'?'employee':'admin';document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';document.getElementById('user-badge').textContent=u;loadAndRender();}}catch(e){}
-})();
 document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 // ─── STATE ───────────────────────────────────────────────────
@@ -418,8 +415,21 @@ function flt(v){return parseFloat(v)||0;}
 function showToast(msg){const t=document.getElementById('toast-el');t.textContent=msg;t.className='toast show';setTimeout(()=>t.className='toast',2200);}
 
 // ─── SUPABASE CRUD ───────────────────────────────────────────
+async function fetchAppointments(){
+  const data=[];
+  const columns=userType==='employee'?'id,date,time,name,car,service,phone,addr,inst,status':'*';
+  for(let offset=0;;){
+    const result=await sb.from('appointments').select(columns).order('date').order('time').order('id').range(offset,offset+499);
+    if(result.error)return {data:null,error:result.error};
+    const page=result.data||[];
+    data.push(...page);
+    if(!page.length)break;
+    offset+=page.length;
+  }
+  return {data,error:null};
+}
 async function loadAndRender(){
-  const {data,error} = await sb.from('appointments').select('*').order('date').order('time');
+  const {data,error} = await fetchAppointments();
   if(error){showToast('Error cargando citas');console.error(error);return;}
   appts = data || [];
   await render();
@@ -434,7 +444,8 @@ async function dbInsert(obj){
 
 async function dbUpdate(id, obj){
   const {error} = await sb.from('appointments').update(obj).eq('id',String(id));
-  if(error){showToast('Error actualizando');console.error(error);}
+  if(error){showToast('Error actualizando');console.error(error);return false;}
+  return true;
 }
 
 async function dbDelete(id){
@@ -443,22 +454,30 @@ async function dbDelete(id){
 }
 
 // ─── FORM ────────────────────────────────────────────────────
-function calcCom(m,i){
-  if(i==='angelo_solo')return flt(m)*0.40;
-  if(i==='pino')return 0;
-  if(i==='angelo_pino')return flt(m)*0.25;
-  return 0;
+const INSTALLERS = [
+  ['angelo_solo','Angelo solo',0.40,0], ['pino','Pino',0,0],
+  ['angelo_pino','Angelo y Pino',0.25,0],
+  ['alejandro_solo','Alejandro solo',0,0.30],
+  ['alejandro_pino','Alejandro y Pino',0,0.20],
+  ['angelo_alejandro','Angelo y Alejandro',0.25,0.15]
+];
+function installerInfo(inst){return INSTALLERS.find(x=>x[0]===inst)||['','—',0,0];}
+function money(v){return '$'+flt(v).toFixed(2);}
+function calcCom(m,i){return Math.round(flt(m)*installerInfo(i)[2]*100)/100;}
+function calcAlejandro(m,i){return Math.round(flt(m)*installerInfo(i)[3]*100)/100;}
+function alejandroTotal(rows){return rows.reduce((sum,a)=>sum+calcAlejandro(a.monto,a.inst),0);}
+function alejandroWeekCard(rows){
+  return `<div class="wt-item"><div class="wn">${money(alejandroTotal(rows))}</div><div class="wl">Comisión Alejandro</div></div>`;
 }
 function updPrev(){
   const m=document.getElementById('f-monto').value;
   const i=document.getElementById('f-inst').value;
   const el=document.getElementById('cprev');
   if(!m||!i){el.textContent='Selecciona instalador y monto';return;}
-  const com=calcCom(m,i);
-  if(com===0){el.textContent='Sin comisión para este instalador';return;}
-  const pct=(i==='angelo_solo')?40:25;
-  const who=(i==='angelo_pino')?'Angelo y Pino':'Angelo';
-  el.textContent='Comisión '+who+' ('+pct+'%): $'+com.toFixed(2);
+  const info=installerInfo(i),parts=[];
+  if(info[2])parts.push('Angelo ('+Math.round(info[2]*100)+'%): '+money(calcCom(m,i)));
+  if(info[3])parts.push('Alejandro ('+Math.round(info[3]*100)+'%): '+money(calcAlejandro(m,i)));
+  el.textContent=parts.join(' · ')||'Sin comisión para este instalador';
 }
 
 function toggleCustomService(){
@@ -535,21 +554,32 @@ async function saveAppt(){
     forma:document.getElementById('f-forma').value,
     tip:flt(document.getElementById('f-tip').value),
     directo:flt(document.getElementById('f-directo').value),
-    status:'pending'
+    status:editId?(appts.find(a=>String(a.id)===String(editId))?.status||'pending'):'pending'
   };
-  document.querySelector('.bsave').textContent='Guardando...';
+  if(userType==='employee'){
+    ['monto','inst','com','pago','forma','tip','directo'].forEach(key=>delete obj[key]);
+  }
+  const saveButton=document.querySelector('.bsave');
+  if(saveButton.disabled)return;
+  saveButton.disabled=true;
+  saveButton.textContent='Guardando...';
+  let savedOk=false;
+  try {
   if(editId){
-    await dbUpdate(editId,obj);
-    showToast('Cita actualizada');
+    savedOk=await dbUpdate(editId,obj);
+    if(savedOk)showToast('Cita actualizada');
   } else {
     const saved=await dbInsert(obj);
+    savedOk=!!saved;
     if(saved)showToast('Cita guardada');
   }
+  if(!savedOk)return;
   closeForm();
   await loadAndRender();
-  document.querySelector('.bsave').textContent='Guardar cita';
   if(curView==='mes'&&selDate)showCalDay(selDate);
   if(curView==='agenda')await renderAgenda();
+  } catch(error){console.error(error);showToast('Error guardando');}
+  finally{saveButton.disabled=false;saveButton.textContent='Guardar cita';}
 }
 
 async function delAppt(id){
@@ -562,6 +592,7 @@ async function delAppt(id){
 }
 
 async function refreshWeekSummary(dateStr){
+  if(userType!=='admin')return;
   // Find the Monday of the week containing dateStr
   const d = new Date(dateStr+'T12:00');
   const dow = d.getDay(); // 0=Sun,1=Mon...
@@ -590,6 +621,7 @@ async function refreshWeekSummary(dateStr){
     <div class="wt-grid">
       <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
       <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
+      ${alejandroWeekCard(appts.filter(a=>a.date>=wkStart&&a.date<=mkDs(new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+6).getFullYear(),new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+6).getMonth(),new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+6).getDate())))}
       <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
       <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
       ${accumulated!==0?`<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">${accumulated>0?'Acumulado semanas anteriores':'Angelo tiene crédito de semanas anteriores'}</div></div>`:''}
@@ -605,6 +637,7 @@ async function refreshWeekSummary(dateStr){
 
 async function updField(id,field,val){
   const a=appts.find(x=>String(x.id)===String(id));if(!a)return;
+  if(userType==='employee'&&field!=='status')return;
   a[field]=field==='monto'||field==='tip'||field==='directo'?flt(val):val;
   const update={[field]:a[field]};
   if(field==='inst'){
@@ -615,7 +648,9 @@ async function updField(id,field,val){
     update.com=a.com;
     if(field==='inst') update.monto=a.monto;
   }
-  await dbUpdate(id,update);
+  const saved=await dbUpdate(id,update);
+  if(!saved){await loadAndRender();return;}
+  updateStats();
   // Refresh only the affected table without reloading all data (preserves order)
   if(curView==='mes'&&selDate){
     const da=appts.filter(x=>x.date===selDate);
@@ -636,7 +671,8 @@ async function updField(id,field,val){
           `<div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>`+
           `<div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>`+
           `<div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>`+
-          `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`;
+          `<div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>`+
+      `<div class="sum-i">Comisión Alejandro: <span>${money(alejandroTotal(sorted))}</span></div>`;
       }
     }
     // Always refresh the week summary block
@@ -649,7 +685,7 @@ function getTableHeaders() {
   if (userType === 'employee') {
     return '<th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Instalador</th>';
   } else {
-    return '<th></th><th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>Directo Angelo $</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Tip $</th>';
+    return '<th></th><th>Estado</th><th>Cliente</th><th>Hora</th><th>Vehículo/Servicio</th><th>Monto</th><th>Directo Angelo $</th><th>Forma pago</th><th>Instalador</th><th>Comisión Angelo</th><th>Comisión Alejandro</th><th>Tip $</th>';
   }
 }
 
@@ -670,7 +706,7 @@ function buildTableRows(da,tbodyId,sumElId){
   }
   
   if(!sorted.length){
-    const colspan = userType === 'employee' ? 5 : 11;
+    const colspan = userType === 'employee' ? 5 : 12;
     tbody.innerHTML=`<tr><td colspan="${colspan}" class="empty-r">No hay citas. ${userType === 'admin' ? 'Toca "+ Agregar" para crear una.' : ''}</td></tr>`;
     return;
   }
@@ -699,16 +735,16 @@ function buildTableRows(da,tbodyId,sumElId){
         </td>
         <td class="td-time">${a.time||'—'}</td>
         <td style="min-width:140px;max-width:200px;white-space:normal;font-size:11px;word-break:break-word;color:var(--muted)">${a.car||''}${a.service?' · '+a.service:''}</td>
-        <td style="min-width:130px;font-size:12px">${a.inst==='angelo_solo'?'Angelo solo':a.inst==='pino'?'Pino':a.inst==='angelo_pino'?'Angelo y Pino':'—'}</td>
+        <td style="min-width:130px;font-size:12px">${installerInfo(a.inst)[1]}</td>
       </tr>`;
     } else {
       // Full admin view
       const ct=a.com>0?`$${flt(a.com).toFixed(2)} (${a.inst==='angelo_solo'?'40%':'25%'})`:'—';
       const instOpts=`<option value="">—</option>`+
-        [['angelo_solo','Angelo solo (40%)'],['pino','Pino'],['angelo_pino','Angelo y Pino (25%)']].map(([v,l])=>
+        INSTALLERS.map(([v,l,ang,ale])=>[v,l+(ang||ale?' ('+[ang?'Angelo '+Math.round(ang*100)+'%':'',ale?'Alejandro '+Math.round(ale*100)+'%':''].filter(Boolean).join(' / ')+')':'')]).map(([v,l])=>
           `<option value="${v}"${a.inst===v?' selected':''}>${l}</option>`).join('');
       const pagoOpts=`<option value="">—</option><option value="si"${a.pago==='si'?' selected':''}>Sí</option><option value="no"${a.pago==='no'?' selected':''}>No</option>`;
-      const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
+      const formaOpts=`<option value="">—</option>${['Cash','Zelle','Tarjeta','Cheque','Quickbooks','Cash App','Venmo','Square','Otro'].map(f=>`<option${a.forma===f?' selected':''}>${f}</option>`).join('')}`;
       
       return `<tr>
         <td style="text-align:center;width:32px"><button class="delbtn" onclick="delAppt('${id}')">✕</button></td>
@@ -731,6 +767,7 @@ function buildTableRows(da,tbodyId,sumElId){
         <td><select class="tsel" style="min-width:90px" onchange="updField('${id}','forma',this.value)">${formaOpts}</select></td>
         <td style="min-width:150px"><select class="tsel" onchange="updField('${id}','inst',this.value)">${instOpts}</select></td>
         <td class="td-com" id="com-${id}">${ct}</td>
+        <td class="td-com">${money(calcAlejandro(a.monto,a.inst))}</td>
         <td><input class="tinp" type="number" value="${a.tip||''}" placeholder="$0" style="width:60px" onblur="updField('${id}','tip',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
       </tr>`;
     }
@@ -777,7 +814,7 @@ async function renderBalanceCard(){
   const el=document.getElementById('balance-card');if(!el)return;
   
   // Get ALL appointments from database, not just current month
-  const {data,error} = await sb.from('appointments').select('*').order('date');
+  const {data,error} = await fetchAppointments();
   if(error){console.error('Error loading all appointments for balance:',error);return;}
   const allAppts = data || [];
   
@@ -813,7 +850,7 @@ async function renderBalanceCard(){
 
 async function calcPreviousUnpaidWeeks(currentWeekStart) {
   // Get ALL appointments to calculate unpaid weeks before current week
-  const {data,error} = await sb.from('appointments').select('*').order('date');
+  const {data,error} = await fetchAppointments();
   if(error){console.error('Error loading appointments for accumulated calculation:',error);return 0;}
   const allAppts = data || [];
   
@@ -882,13 +919,13 @@ async function renderAgenda(){
     if(da.length){
       let tm=0,tc=0,td=0,tt=0;
       da.forEach(a=>{tm+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
-      html+=`<div class="dp-sum" id="agsum-${ds}">
+      if(userType==='admin')html+=`<div class="dp-sum" id="agsum-${ds}">
         <div class="sum-i">Ingresos: <span>$${tm.toFixed(2)}</span></div>
         <div class="sum-i">Comisión: <span>$${tc.toFixed(2)}</span></div>
         <div class="sum-i">Tips: <span>$${tt.toFixed(2)}</span></div>
         <div class="sum-i">Neto Angelo: <span>$${(tc+tt-td).toFixed(2)}</span></div>
-      </div>
-      <div class="tscroll"><table><thead><tr>
+      </div>`;
+      html+=`<div class="tscroll"><table><thead><tr>
         ${getTableHeaders()}
       </tr></thead><tbody id="atbody-${ds}"></tbody></table></div>`;
     } else {
@@ -896,7 +933,7 @@ async function renderAgenda(){
     }
     html+='</div></div>';
 
-    if(dow===0){
+    if(dow===0&&userType==='admin'){
       // FIXED: Recalculate weekly totals to include ALL days of the week (including prev month)
       const weekEndDate = new Date(curYear, curMonth, d);
       const weekStartDate = new Date(weekEndDate);
@@ -934,6 +971,7 @@ async function renderAgenda(){
         <div class="wt-grid">
           <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
           <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
+          ${alejandroWeekCard(appts.filter(a=>a.date>=currentWeekStart&&a.date<=ds))}
           <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
           <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
           ${accumulated !== 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">${accumulated > 0 ? 'Acumulado semanas anteriores' : 'Angelo tiene crédito de semanas anteriores'}</div></div>` : ''}
@@ -950,9 +988,7 @@ async function renderAgenda(){
     }
   }
 
-  if(new Date(curYear,curMonth,dim).getDay()!==0&&(wN>0||wM>0)){
-    const net=wC+wT-wD;const wk=wK;const isPaid=weekPaid[wk]||false;
-    
+  if(userType==='admin'&&new Date(curYear,curMonth,dim).getDay()!==0&&(wN>0||wM>0)){
     // Calculate the Monday that starts this week (for proper "previous weeks" calculation)
     const currentWeekStart = (() => {
       const lastDay = new Date(curYear, curMonth, dim);
@@ -962,6 +998,10 @@ async function renderAgenda(){
       return mkDs(monday.getFullYear(), monday.getMonth(), monday.getDate());
     })();
     
+    const partialRows=appts.filter(a=>a.date>=currentWeekStart&&a.date<=mkDs(curYear,curMonth,dim));
+    wM=0;wC=0;wD=0;wT=0;wN=partialRows.length;wK=currentWeekStart;
+    partialRows.forEach(a=>{wM+=flt(a.monto);wC+=flt(a.com);wD+=flt(a.directo);wT+=flt(a.tip);});
+    const net=wC+wT-wD,isPaid=weekPaid[wK]||false;
     const accumulated = await calcPreviousUnpaidWeeks(currentWeekStart);
     const totalWithAccumulated = net + accumulated;
     html+=`<div class="week-total" id="wt-${wK}">
@@ -969,6 +1009,7 @@ async function renderAgenda(){
       <div class="wt-grid">
         <div class="wt-item"><div class="wn">$${wM.toFixed(2)}</div><div class="wl">Ingresos totales</div></div>
         <div class="wt-item"><div class="wn">$${wC.toFixed(2)}</div><div class="wl">Comisión Angelo</div></div>
+        ${alejandroWeekCard(partialRows)}
         <div class="wt-item"><div class="wn">$${wT.toFixed(2)}</div><div class="wl">Tips Angelo</div></div>
         <div class="wt-item"><div class="wn">$${wD.toFixed(2)}</div><div class="wl">Pagó directo</div></div>
         ${accumulated !== 0 ? `<div class="wt-item"><div class="wn">$${accumulated.toFixed(2)}</div><div class="wl">${accumulated > 0 ? 'Acumulado semanas anteriores' : 'Angelo tiene crédito de semanas anteriores'}</div></div>` : ''}
@@ -995,6 +1036,7 @@ function toggleAD(id){const el=document.getElementById(id);if(el)el.style.displa
 
 // ─── STATS & RENDER ──────────────────────────────────────────
 function updateStats(){
+  if(userType!=='admin')return;
   const ma=appts.filter(a=>{
     if(!a.date)return false;
     const p=a.date.split('-');
@@ -1002,6 +1044,7 @@ function updateStats(){
   });
   let ti=0,tc=0,td=0,tt=0;
   ma.forEach(a=>{ti+=flt(a.monto);tc+=flt(a.com);td+=flt(a.directo);tt+=flt(a.tip);});
+  document.getElementById('s-alejandro').textContent=money(alejandroTotal(ma));
   document.getElementById('s-citas').textContent=ma.length;
   document.getElementById('s-ing').textContent='$'+ti.toFixed(0);
   document.getElementById('s-com').textContent='$'+tc.toFixed(0);
@@ -1057,6 +1100,10 @@ async function render(){
   if(curView==='agenda')await renderAgenda();
 }
 
+(function(){
+  try{const u=sessionStorage.getItem('gp_user');if(u&&USERS[u]){currentUser=u;userType=u==='alejandro'?'employee':'admin';document.body.className=userType==='employee'?'employee':'admin';document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';document.getElementById('user-badge').textContent=u;loadAndRender();}}catch(e){}
+})();
+
 // ─── REALTIME ────────────────────────────────────────────────
 sb.channel('appointments-changes')
   .on('postgres_changes',{event:'*',schema:'public',table:'appointments'},()=>{
@@ -1067,3 +1114,4 @@ sb.channel('appointments-changes')
 
 </body>
 </html>
+
